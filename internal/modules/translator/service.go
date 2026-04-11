@@ -27,7 +27,7 @@ func (svc *TranslationService) Translate(ctx context.Context, input string, targ
 	result, err := svc.Client.client.Translate(ctx, []string{input}, langTag, nil)
 
 	if err != nil {
-		return "", fmt.Errorf("Not implemented")
+		return "", fmt.Errorf("Google Cloud Error: %w", err)
 	}
 
 	return Join(result), nil
