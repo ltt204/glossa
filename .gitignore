@@ -1,0 +1,37 @@
+# --- Binaries and Tooling ---
+# Compiled executables (often named after the directory or 'main')
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+bin/
+out/
+
+# Main binary (common convention for Gin apps)
+main
+server
+
+# --- Dependencies ---
+# Only ignore vendor/ if you aren't "vendoring" your code. 
+# Most modern Go projects don't need this.
+# vendor/
+
+# --- Environment and Secrets ---
+# Crucial for Gin apps that use .env files for port/DB config
+*.env
+.env.*
+!.env.example
+
+# --- Testing and Coverage ---
+*.test
+*.out
+coverage.txt
+
+# --- IDE/OS Specific ---
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+service-account.json
