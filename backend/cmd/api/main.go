@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"glossa/internal/modules/translator"
+	"glossa/backend/modules/translator"
 	"log"
 	"os"
 

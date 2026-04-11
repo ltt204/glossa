@@ -2,7 +2,7 @@ package translator
 
 import (
 	"fmt"
-	"glossa/internal/modules/translator/dtos"
+	"glossa/backend/modules/translator/dtos"
 	"net/http"
 	"time"
 
