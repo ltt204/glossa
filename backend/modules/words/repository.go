@@ -19,25 +19,35 @@ func NewWordRepository(pool *pgxpool.Pool) *WordRepository {
 
 // CREATE
 // Working on splitting create and update operation
-func (wr *WordRepository) Save(ctx context.Context, word Word) (string, error) {
+func (wr *WordRepository) Save(ctx context.Context, word Word) (Word, error) {
 	var query = `
-	INSERT INTO words (user_id, origin, source_lang, translated, target_lang)
+	INSERT INTO words ("user_id", "origin", "source_lang", "translated", "target_lang")
 	VALUES ($1, $2, $3, $4, $5)
-	ON CONFLICT (id) DO UPDATE SET 
-		translated = EXCLUDED.translated
-		target = EXCLUDED.target
-	RETURNING id, created_at
+	RETURNING ` + wordColumns + `
 	`
-	var id string
-	err := wr.pool.QueryRow(ctx, query, word.UserId, word.Origin, word.SourceLang, word.Translated, word.TargetLang).Scan(&id)
+
+	var savedWord Word
+	result := wr.pool.QueryRow(ctx, query, "00000000-0000-0000-0000-000000000001", word.Origin, word.SourceLang, word.Translated, word.TargetLang)
+
+	err := result.Scan(
+		&savedWord.Id,
+		&savedWord.UserId,
+		&savedWord.Origin,
+		&savedWord.SourceLang,
+		&savedWord.Translated,
+		&savedWord.TargetLang,
+		&savedWord.createdAt,
+		&savedWord.updatedAt,
+		&savedWord.deletedAt,
+	)
+
 	if err != nil {
-		return "", err
+		return Word{}, fmt.Errorf("failed to insert word: %w", err)
 	}
-	return id, nil
+	return savedWord, nil
 }
 
-//UPDATE
-
+// UPDATE
 func (wr *WordRepository) Update(ctx context.Context, word Word) (string, error) {
 	return "", fmt.Errorf("not implemented")
 }
@@ -78,7 +88,7 @@ func (wr *WordRepository) GetAll(ctx context.Context) ([]Word, error) {
 }
 
 func (wr *WordRepository) GetById(ctx context.Context, wordId string) (Word, error) {
-	query := `SELECT ` + wordColumns + `FROM words
+	query := `SELECT ` + wordColumns + ` FROM words
 		WHERE id = $1
 	`
 
@@ -96,7 +106,7 @@ func (wr *WordRepository) GetById(ctx context.Context, wordId string) (Word, err
 	)
 
 	if err != nil {
-		return Word{}, fmt.Errorf("words: error for get all words: %w", ErrDatabaseError)
+		return Word{}, fmt.Errorf("words: error for get word %s: %w", wordId, err)
 	}
 
 	return word, nil

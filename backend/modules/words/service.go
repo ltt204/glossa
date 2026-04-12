@@ -10,7 +10,7 @@ func NewWordService(wr *WordRepository) *WordService {
 	return &WordService{Wr: wr}
 }
 
-func (ws *WordService) Save(ctx context.Context, word Word) (string, error) {
+func (ws *WordService) Save(ctx context.Context, word Word) (Word, error) {
 	return ws.Wr.Save(ctx, word)
 }
 
