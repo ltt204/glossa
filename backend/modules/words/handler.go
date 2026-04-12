@@ -19,6 +19,7 @@ func NewHandler(svc *WordService) *WordsHandler {
 func (h *WordsHandler) RegisterRoute(rg *gin.RouterGroup) {
 	rg.POST("/words", h.handleSaveWord)
 	rg.GET("/words", h.handleGetWords)
+	rg.DELETE("/words/:id", h.handleDeleteWord)
 }
 
 func (h *WordsHandler) handleSaveWord(ctx *gin.Context) {
@@ -59,8 +60,21 @@ func (h *WordsHandler) handleGetWords(ctx *gin.Context) {
 	})
 }
 
-func (h *WordsHandler) handleGetWordById(ctx *gin.Context) {
+func (h *WordsHandler) handleDeleteWord(ctx *gin.Context) {
+	wordId, ok := ctx.Params.Get("id")
+	if !ok {
 
+	}
+	err := h.wordSvc.Delete(ctx, wordId)
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": fmt.Errorf("Get Words Error: %w", err).Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusNoContent, nil)
 }
 
 func (h *WordsHandler) handleGetWordsByUserId(ctx *gin.Context) {
