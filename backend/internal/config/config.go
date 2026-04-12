@@ -9,16 +9,16 @@ import (
 )
 
 type Config struct {
-	BaseUrl string
-
-	AllowOrigins []string
+	BaseUrl          string
+	AllowOrigins     []string
+	ConnectionString string
 }
 
 func Load() (*Config, error) {
 	// Env
 	err := godotenv.Load()
 	if err != nil {
-		return nil, fmt.Errorf("Error loading .env file: %w", err)
+		return nil, fmt.Errorf("error loading .env file: %w", err)
 	}
 
 	baseUrl := os.Getenv("BASE_URL")
@@ -26,13 +26,20 @@ func Load() (*Config, error) {
 		baseUrl = "localhost:8000"
 	}
 
-	allowOrigins := strings.Split(os.Getenv("ALLOW_ORIGINS"), ",")
-
-	if len(allowOrigins) == 0 {
+	raw := os.Getenv("ALLOW_ORIGINS")
+	var allowOrigins []string
+	if raw == "" {
 		allowOrigins = []string{"http://localhost:3000"}
+	} else {
+		allowOrigins = strings.Split(raw, ",")
+	}
+
+	connectionString := os.Getenv("CONNECTION_STRING")
+	if connectionString == "" {
+		connectionString = "postgres://postgres:postgres@localhost:5432/glossa?sslmode=disable"
 	}
 
 	return &Config{
-		baseUrl, allowOrigins,
+		baseUrl, allowOrigins, connectionString,
 	}, nil
 }

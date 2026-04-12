@@ -3,7 +3,10 @@ package main
 import (
 	"context"
 	"glossa/internal/config"
+	"glossa/internal/db"
 	"glossa/modules/translator"
+	"glossa/modules/words"
+	"log"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -13,16 +16,31 @@ func main() {
 	ctx := context.Background()
 	ggclient, err := translator.NewGoogleClient(ctx)
 	if err != nil {
-
+		log.Fatal("Failed to initialize translation client: ", err)
 	}
 
 	appConfig, err := config.Load()
+	if err != nil {
+		log.Fatal("Failed to load app config: ", err)
+	}
+
+	connectionPool, err := db.Connect(appConfig.ConnectionString)
+
+	if err != nil {
+		log.Fatal("Failed to establish connection with database: ", err)
+	}
+
+	// Executes (Closed the connection) when the surrounding function (main --> application is stoped) returns
+	defer connectionPool.Close()
+
+	wordRepo := words.NewWordRepository(connectionPool)
+	wordSvc := words.NewWordService(wordRepo)
+	wordHandler := words.NewHandler(wordSvc)
 
 	translationSvc, err := translator.NewTranslationService(ggclient)
 	handler := translator.NewHandler(translationSvc)
 
 	var r *gin.Engine = gin.Default()
-
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     appConfig.AllowOrigins,
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
@@ -31,10 +49,8 @@ func main() {
 		AllowCredentials: true,
 		MaxAge:           12 * 3600, // 12 hours
 	}))
-
 	api := r.Group("/api")
-
 	handler.RegisterRoute(api)
-
+	wordHandler.RegisterRoute(api)
 	r.Run(appConfig.BaseUrl)
 }
