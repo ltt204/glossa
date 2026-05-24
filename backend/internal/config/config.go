@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"os"
 	"strings"
 
@@ -15,11 +14,10 @@ type Config struct {
 }
 
 func Load() (*Config, error) {
-	// Env
-	err := godotenv.Load()
-	if err != nil {
-		return nil, fmt.Errorf("error loading .env file: %w", err)
-	}
+	// Load .env file if it exists.
+	// In Docker, environment variables are injected directly, so no file is needed.
+	// We intentionally ignore the error here.
+	godotenv.Load()
 
 	baseUrl := os.Getenv("BASE_URL")
 	if baseUrl == "" {

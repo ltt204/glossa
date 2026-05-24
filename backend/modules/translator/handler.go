@@ -1,10 +1,10 @@
 package translator
 
 import (
-	"fmt"
+	"glossa/internal/apperror"
+	"glossa/internal/responsedto"
 	"glossa/modules/translator/dtos"
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -21,25 +21,22 @@ func (h *TranslationHandler) handleTranslate(ctx *gin.Context) {
 	var req dtos.TranslateRequest
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"status_code": "401",
-			"error":       fmt.Errorf("Bad body structure"),
-			"timestamp":   time.Now(),
-		})
-	}
-
-	result, err := h.translationSvc.Translate(ctx, req.Text, req.Target)
-
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": fmt.Errorf("Translate Error: %w", err).Error(),
-		})
+		appErr := apperror.ErrBadJsonStructure.WithErr(err)
+		ctx.JSON(appErr.Status, appErr.ToGinMap())
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"translation": result,
-	})
+	result, err := h.translationSvc.Translate(ctx, req.Text, req.Target)
+	if err != nil {
+		appErr := apperror.FailedTranslateWord.WithErr(err)
+		appRes := responsedto.ErrorResponse(appErr)
+		ctx.JSON(appErr.Status, appRes)
+		return
+	}
+
+	appRes := responsedto.SuccessResponse("Translate success", result)
+
+	ctx.JSON(http.StatusOK, appRes)
 }
 
 func (h *TranslationHandler) RegisterRoute(rg *gin.RouterGroup) {

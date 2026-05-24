@@ -9,10 +9,18 @@ setup:
 verify:
 	go mod verify
 
+## Start everything in Docker with hot reload (Air watches for changes)
 run:
-	docker compose up -d 
-	go build -o tmp/main cmd/api/main.go
+	docker compose -f ../docker-compose.yml up --build
+
+## Run the backend locally (without Docker) — useful for quick iteration
+run-local:
+	go build -o tmp/main ./cmd/api/main.go
 	air
+
+## Build the production Docker image
+build-prod:
+	docker build --target prod -t glossa-backend:latest .
 
 # FOR MIGRATION
 migrate-up:                                                                                                                                                                                                                                                                                                                 

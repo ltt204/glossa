@@ -1,6 +1,7 @@
 package translator
 
 import (
+	"errors"
 	"strings"
 
 	"cloud.google.com/go/translate"
@@ -14,4 +15,10 @@ func Join(inputs []translate.Translation) string {
 	}
 
 	return result.String()
+}
+
+// errorAs is a thin wrapper around errors.As.
+// It lets service.go stay clean without importing "errors" directly.
+func errorAs(err error, target any) bool {
+	return errors.As(err, target)
 }

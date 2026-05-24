@@ -1,0 +1,1 @@
+# Gloosa - Language Learning Extension
