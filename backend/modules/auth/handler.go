@@ -17,12 +17,16 @@ func NewHandler(s AuthService) *AuthHandler {
 	}
 }
 
-func (h *AuthHandler) RegisterRoutes(r *gin.RouterGroup) {
-	publicRoutes := r.Group("/auth")
+func (h *AuthHandler) RegisterRoutes(rg *gin.RouterGroup) {
+	publicRoutes := rg.Group("/auth")
 	publicRoutes.POST("/signup", h.handleSignup)
 	publicRoutes.POST("/signin", h.handleSignin)
 	publicRoutes.POST("/refresh", h.handleRefreshToken)
-	publicRoutes.POST("/logout", h.handleLogout)
+}
+
+func (h *AuthHandler) RegisterProtectedRoutes(rg *gin.RouterGroup) {
+	protectedRoutes := rg.Group("/auth")
+	protectedRoutes.POST("/logout", h.handleLogout)
 }
 
 func (h *AuthHandler) handleSignup(ctx *gin.Context) {
@@ -68,12 +72,7 @@ func (h *AuthHandler) handleRefreshToken(ctx *gin.Context) {
 }
 
 func (h *AuthHandler) handleLogout(ctx *gin.Context) {
-	var req LogoutRequest
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(400, responsedto.ErrorResponse(apperror.New("BAD_REQUEST", 400, "Invalid request", err)))
-		return
-	}
-	if result, err := h.authSvc.Logout(ctx, req); err != nil {
+	if result, err := h.authSvc.Logout(ctx); err != nil {
 		ctx.JSON(400, responsedto.ErrorResponse(err))
 		return
 	} else {

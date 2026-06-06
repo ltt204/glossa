@@ -92,17 +92,16 @@ func (us *AuthService) RefreshToken(ctx context.Context, req RefreshTokenRequest
 	}, nil
 }
 
-func (us *AuthService) Logout(ctx context.Context, req LogoutRequest) (bool, *apperror.AppError) {
-	if req.TokenId == "" {
-		return false, apperror.New(
-			"BAD_REQUEST",
-			http.StatusBadRequest,
-			"Token ID is required",
-			nil,
+func (us *AuthService) Logout(ctx context.Context) (bool, *apperror.AppError) {
+	userID := ctx.Value("userID").(string)
+
+	if userID == "" {
+		return false, apperror.ErrInvalidUserData.WithMessage(
+			"User ID is required!",
 		)
 	}
 
-	ok, err := us.authRepo.Logout(ctx, LogoutRequest(req))
+	ok, err := us.authRepo.Logout(ctx, userID)
 	if err != nil {
 		apperr := apperror.NewAppError(err)
 		return false, apperr

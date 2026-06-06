@@ -10,7 +10,7 @@ type AuthRepository interface {
 	Signup(ctx context.Context, req users.CreateUserRequest) (users.User, error)
 	Signin(ctx context.Context, req SigninRequest) (SigninResponse, error)
 	RefreshToken(ctx context.Context, req RefreshTokenRequest) (string, error)
-	Logout(ctx context.Context) (bool, error)
+	Logout(ctx context.Context, userID string) (bool, error)
 	GetByEmail(ctx context.Context, email string) (users.User, error)
 }
 
@@ -67,6 +67,6 @@ func (authRepo *authRepository) RefreshToken(ctx context.Context, req RefreshTok
 	return accessToken, nil
 }
 
-func (authRepo *authRepository) Logout(ctx context.Context) (bool, error) {
-	return authRepo.refRepo.RemoveAllByUserId(ctx)
+func (authRepo *authRepository) Logout(ctx context.Context, userID string) (bool, error) {
+	return authRepo.refRepo.RemoveAllByUserId(ctx, userID)
 }

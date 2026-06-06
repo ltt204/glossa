@@ -65,12 +65,14 @@ func (refRepo *tokenRepository) GenerateTokens(ctx context.Context, userID strin
 		return "", "", err
 	}
 
-	// Refresh token (opaque random bytes, long-lived)
-	rawRefreshToken := make([]byte, 32)
-	if _, err := rand.Read(rawRefreshToken); err != nil {
+	// Refresh token (hashed, long-lived)
+	rawBytes := make([]byte, 32)
+	if _, err := rand.Read(rawBytes); err != nil {
 		return "", "", err
 	}
-	hash := sha256.Sum256([]byte(rawRefreshToken))
+	rawRefToken := hex.EncodeToString(rawBytes)
+
+	hash := sha256.Sum256([]byte(rawRefToken))
 	refreshToken := hex.EncodeToString(hash[:])
 
 	// Save token to database
@@ -82,7 +84,7 @@ func (refRepo *tokenRepository) GenerateTokens(ctx context.Context, userID strin
 		return "", "", err
 	}
 
-	return accessToken, string(rawRefreshToken), nil
+	return accessToken, rawRefToken, nil
 }
 
 func (refRepo *tokenRepository) GenerateAcccessTokens(ctx context.Context, refreshToken string) (string, error) {
@@ -92,7 +94,6 @@ func (refRepo *tokenRepository) GenerateAcccessTokens(ctx context.Context, refre
 	hash := sha256.Sum256([]byte(refreshToken))
 	hashedRefreshToken := hex.EncodeToString(hash[:])
 
-	// Re-hashing would produce a different value, so use the token directly.
 	var refreshTokenDO RefreshToken
 	row := refRepo.pool.QueryRow(ctx, "SELECT * FROM refresh_token WHERE token_hash = $1", hashedRefreshToken)
 	if err := row.Scan(&refreshTokenDO.ID, &refreshTokenDO.UserID, &refreshTokenDO.TokenHash, &refreshTokenDO.CreatedAt, &refreshTokenDO.UpdatedAt, &refreshTokenDO.DeletedAt); err != nil {

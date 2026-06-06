@@ -4,6 +4,7 @@ import (
 	"context"
 	"glossa/internal/config"
 	"glossa/internal/db"
+	"glossa/internal/middleware"
 	"glossa/modules/auth"
 	"glossa/modules/translator"
 	"glossa/modules/users"
@@ -43,10 +44,10 @@ func main() {
 	tokenRepo := auth.NewTokenRepository(connectionPool, []byte(appConfig.JwtSecret))
 	authRepo := auth.NewAuthRepository(userRepo, tokenRepo)
 	authService := auth.NewAuthService(authRepo, tokenRepo)
-	authHandler := auth.NewHandler(authService)
+	authHandler := auth.NewHandler(*authService)
 
 	translationSvc, err := translator.NewTranslationService(ggclient)
-	handler := translator.NewHandler(translationSvc)
+	translateHandler := translator.NewHandler(translationSvc)
 
 	var r *gin.Engine = gin.Default()
 	r.Use(cors.New(cors.Config{
@@ -57,10 +58,19 @@ func main() {
 		AllowCredentials: true,
 		MaxAge:           12 * 3600, // 12 hours
 	}))
-	api := r.Group("/api")
-	handler.RegisterRoutes(api)
-	wordHandler.RegisterRoutes(api)
-	authHandler.RegisterRoutes(api)
+
+	routes := r.Group("/api")
+	{
+		authHandler.RegisterRoutes(routes)
+	}
+
+	protectedRoutes := routes.Group("/")
+	protectedRoutes.Use(middleware.AuthMiddleware([]byte(appConfig.JwtSecret)), middleware.Logger())
+	{
+		authHandler.RegisterProtectedRoutes(protectedRoutes)
+		wordHandler.RegisterRoutes(protectedRoutes)
+		translateHandler.RegisterRoutes(protectedRoutes)
+	}
 
 	r.Run(appConfig.BaseUrl)
 }
