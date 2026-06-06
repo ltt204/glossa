@@ -39,6 +39,6 @@ func (h *TranslationHandler) handleTranslate(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, appRes)
 }
 
-func (h *TranslationHandler) RegisterRoute(rg *gin.RouterGroup) {
+func (h *TranslationHandler) RegisterRoutes(rg *gin.RouterGroup) {
 	rg.POST("/translate", h.handleTranslate)
 }

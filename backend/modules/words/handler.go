@@ -16,7 +16,7 @@ func NewHandler(svc *WordService) *WordsHandler {
 	return &WordsHandler{wordSvc: svc}
 }
 
-func (h *WordsHandler) RegisterRoute(rg *gin.RouterGroup) {
+func (h *WordsHandler) RegisterRoutes(rg *gin.RouterGroup) {
 	rg.POST("/words", h.handleSaveWord)
 	rg.GET("/words", h.handleGetWords)
 	rg.DELETE("/words/:id", h.handleDeleteWord)

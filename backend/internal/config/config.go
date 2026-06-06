@@ -11,6 +11,7 @@ type Config struct {
 	BaseUrl          string
 	AllowOrigins     []string
 	ConnectionString string
+	JwtSecret        string
 }
 
 func Load() (*Config, error) {
@@ -37,7 +38,12 @@ func Load() (*Config, error) {
 		connectionString = "postgres://postgres:postgres@localhost:5432/glossa?sslmode=disable"
 	}
 
+	jwtSecret := os.Getenv("JWT_SECRET")
+	if jwtSecret == "" {
+		jwtSecret = "dev-secret-change-me"
+	}
+
 	return &Config{
-		baseUrl, allowOrigins, connectionString,
+		baseUrl, allowOrigins, connectionString, jwtSecret,
 	}, nil
 }

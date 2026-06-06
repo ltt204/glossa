@@ -27,9 +27,7 @@ func (wr *WordRepository) Save(ctx context.Context, word Word) (Word, error) {
 	`
 
 	var savedWord Word
-	result := wr.pool.QueryRow(ctx, query, "00000000-0000-0000-0000-000000000001", word.Origin, word.SourceLang, word.Translated, word.TargetLang)
-
-	err := result.Scan(
+	err := wr.pool.QueryRow(ctx, query, "00000000-0000-0000-0000-000000000001", word.Origin, word.SourceLang, word.Translated, word.TargetLang).Scan(
 		&savedWord.Id,
 		&savedWord.UserId,
 		&savedWord.Origin,
@@ -54,8 +52,6 @@ func (wr *WordRepository) Update(ctx context.Context, word Word) (string, error)
 
 // READ
 func (wr *WordRepository) GetAll(ctx context.Context) ([]Word, error) {
-	var err = ErrWordNotFound
-
 	var query = `SELECT ` + wordColumns + ` FROM words`
 
 	result, err := wr.pool.Query(ctx, query)

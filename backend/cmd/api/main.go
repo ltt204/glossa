@@ -4,7 +4,9 @@ import (
 	"context"
 	"glossa/internal/config"
 	"glossa/internal/db"
+	"glossa/modules/auth"
 	"glossa/modules/translator"
+	"glossa/modules/users"
 	"glossa/modules/words"
 	"log"
 
@@ -37,6 +39,12 @@ func main() {
 	wordSvc := words.NewWordService(wordRepo)
 	wordHandler := words.NewHandler(wordSvc)
 
+	userRepo := users.NewUserRepository(connectionPool)
+	tokenRepo := auth.NewTokenRepository(connectionPool, []byte(appConfig.JwtSecret))
+	authRepo := auth.NewAuthRepository(userRepo, tokenRepo)
+	authService := auth.NewAuthService(authRepo, tokenRepo)
+	authHandler := auth.NewHandler(authService)
+
 	translationSvc, err := translator.NewTranslationService(ggclient)
 	handler := translator.NewHandler(translationSvc)
 
@@ -50,7 +58,9 @@ func main() {
 		MaxAge:           12 * 3600, // 12 hours
 	}))
 	api := r.Group("/api")
-	handler.RegisterRoute(api)
-	wordHandler.RegisterRoute(api)
+	handler.RegisterRoutes(api)
+	wordHandler.RegisterRoutes(api)
+	authHandler.RegisterRoutes(api)
+
 	r.Run(appConfig.BaseUrl)
 }

@@ -2,6 +2,7 @@ package apperror
 
 import (
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -19,6 +20,18 @@ func New(code string, status int, message string, err error) *AppError {
 		Code:    code,
 		Status:  status,
 		Message: message,
+		Err:     err,
+	}
+}
+
+func NewAppError(err error) *AppError {
+	if apperr, ok := err.(*AppError); ok {
+		return apperr
+	}
+	return &AppError{
+		Code:    "UNKNOWN",
+		Status:  http.StatusInternalServerError,
+		Message: "Unknown error.",
 		Err:     err,
 	}
 }
@@ -52,5 +65,14 @@ func (e *AppError) ToGinMap() gin.H {
 		"status_code": e.Status,
 		"error":       e.Error(),
 		"timestamp":   time.Now(),
+	}
+}
+
+func (e *AppError) WithMessage(msg string) *AppError {
+	return &AppError{
+		Code:    e.Code,
+		Message: msg,
+		Status:  e.Status,
+		Err:     e.Err,
 	}
 }
