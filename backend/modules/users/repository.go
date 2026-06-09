@@ -2,8 +2,10 @@ package users
 
 import (
 	"context"
+	"glossa/internal/apperror"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type UserRepository struct {
@@ -15,10 +17,13 @@ func NewUserRepository(pool *pgxpool.Pool) *UserRepository {
 }
 
 func (ur *UserRepository) Save(ctx context.Context, req CreateUserRequest) (User, error) {
-	var query string = `INSERT INTO users (id, email, password_hash) VALUES (gen_random_uuid(), $1, $2) RETURNING *`
+	bytes, err := bcrypt.GenerateFromPassword([]byte(req.Password), 10)
+	if err != nil {
+		return User{}, apperror.InternalServerError.WithMessage("Something went wrong.")
+	}
 
 	var savedUser User
-	err := ur.pool.QueryRow(ctx, query, req.Email, req.Password).Scan(
+	err = ur.pool.QueryRow(ctx, `INSERT INTO users (id, email, password_hash) VALUES (gen_random_uuid(), $1, $2) RETURNING *`, req.Email, string(bytes)).Scan(
 		&savedUser.ID,
 		&savedUser.Email,
 		&savedUser.Password,

@@ -43,6 +43,11 @@ func Load() (*Config, error) {
 		jwtSecret = "dev-secret-change-me"
 	}
 
+	passwdSalt := os.Getenv("PASSWORD_SALT")
+	if passwdSalt == "" {
+		passwdSalt = "dev-salt-change-me"
+	}
+
 	return &Config{
 		baseUrl, allowOrigins, connectionString, jwtSecret,
 	}, nil

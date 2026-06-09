@@ -4,6 +4,8 @@ import (
 	"context"
 	"glossa/internal/apperror"
 	"glossa/modules/users"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthRepository interface {
@@ -26,7 +28,7 @@ func NewAuthRepository(userRepo UserRepository, refRepo TokenRepository) AuthRep
 func (authRepo *authRepository) Signup(ctx context.Context, req users.CreateUserRequest) (users.User, error) {
 	user, err := authRepo.userRepo.Save(ctx, req)
 	if err != nil {
-		return users.User{}, apperror.ErrFailedToCreate.WithErr(err)
+		return users.User{}, apperror.InternalServerError.WithMessage("Something went wrong.")
 	}
 
 	return user, nil
@@ -44,6 +46,10 @@ func (authRepo *authRepository) Signin(ctx context.Context, req SigninRequest) (
 
 	if user.DeletedAt != nil {
 		return SigninResponse{}, apperror.ErrResourceNotFound.WithMessage("User not found.")
+	}
+
+	if err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
+		return SigninResponse{}, apperror.ErrUnauthorized.WithMessage("Invalid credentials.")
 	}
 
 	accessToken, refreshToken, err := authRepo.refRepo.GenerateTokens(ctx, user.ID)
