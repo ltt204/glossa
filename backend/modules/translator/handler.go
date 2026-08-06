@@ -17,6 +17,18 @@ func NewHandler(svc *TranslationService) *TranslationHandler {
 	return &TranslationHandler{translationSvc: svc}
 }
 
+// Translate
+// @Summary      Translate text
+// @Description  Translate text to a target language using Google Cloud Translation API
+// @Tags         Translator
+// @Accept       json
+// @Produce      json
+// @Param        translateRequest body dtos.TranslateRequest true "Translation request body"
+// @Success      200  {object} responsedto.ApplicationResponse{content=string} "Translate success"
+// @Failure      400  {object} responsedto.ApplicationErrorResponse "Invalid JSON structure"
+// @Failure      500  {object} responsedto.ApplicationErrorResponse "Failed to translate word"
+// @Security     BearerAuth
+// @Router       /api/translate [post]
 func (h *TranslationHandler) handleTranslate(ctx *gin.Context) {
 	var req dtos.TranslateRequest
 

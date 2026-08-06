@@ -24,7 +24,7 @@ func (ws *WordService) GetAll(ctx context.Context) ([]WordResponse, error) {
 	if err != nil {
 		return []WordResponse{}, err
 	}
-	var res []WordResponse
+	var res []WordResponse = make([]WordResponse, 0, len(words))
 	for _, word := range words {
 		res = append(res, word.ToResponse())
 	}

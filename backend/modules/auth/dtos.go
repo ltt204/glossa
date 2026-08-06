@@ -19,9 +19,9 @@ type SignupResponse struct {
 }
 
 type SigninResponse struct {
-	AccessToken  string     `json:"access_token"`
-	RefreshToken string     `json:"refresh_token"`
-	User         users.User `json:"user"`
+	AccessToken  string             `json:"access_token"`
+	RefreshToken string             `json:"refresh_token"`
+	User         users.UserResponse `json:"user"`
 }
 
 // REFRESH TOKEN DTOs
@@ -40,4 +40,25 @@ type RefreshTokenResponse struct {
 type CreateRefreshTokenRequest struct {
 	UserId    string `json:"user_id" binding:"required"`
 	TokenHash string `json:"token_hash" binding:"required"`
+}
+
+// Success Response Wrappers for Swagger
+type SignupSuccessWrapper struct {
+	Message string         `json:"message" example:"User created successfully"`
+	User    SignupResponse `json:"user"`
+}
+
+type SigninSuccessWrapper struct {
+	Message string         `json:"message" example:"User signed in successfully"`
+	User    SigninResponse `json:"user"`
+}
+
+type RefreshTokenSuccessWrapper struct {
+	Message string               `json:"message" example:"User signed in successfully"`
+	User    RefreshTokenResponse `json:"user"`
+}
+
+type LogoutSuccessWrapper struct {
+	Message string `json:"message" example:"User signed out successfully"`
+	User    bool   `json:"user" example:"true"`
 }
