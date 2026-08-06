@@ -1,4 +1,443 @@
+definitions:
+  auth.LogoutSuccessWrapper:
+    properties:
+      message:
+        example: User signed out successfully
+        type: string
+      user:
+        example: true
+        type: boolean
+    type: object
+  auth.RefreshTokenRequest:
+    properties:
+      refresh_token:
+        type: string
+    required:
+    - refresh_token
+    type: object
+  auth.RefreshTokenResponse:
+    properties:
+      access_token:
+        type: string
+    type: object
+  auth.RefreshTokenSuccessWrapper:
+    properties:
+      message:
+        example: User signed in successfully
+        type: string
+      user:
+        $ref: '#/definitions/auth.RefreshTokenResponse'
+    type: object
+  auth.SigninRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  auth.SigninResponse:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+      user:
+        $ref: '#/definitions/users.UserResponse'
+    type: object
+  auth.SigninSuccessWrapper:
+    properties:
+      message:
+        example: User signed in successfully
+        type: string
+      user:
+        $ref: '#/definitions/auth.SigninResponse'
+    type: object
+  auth.SignupRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  auth.SignupResponse:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+      user:
+        $ref: '#/definitions/users.User'
+    type: object
+  auth.SignupSuccessWrapper:
+    properties:
+      message:
+        example: User created successfully
+        type: string
+      user:
+        $ref: '#/definitions/auth.SignupResponse'
+    type: object
+  dtos.TranslateRequest:
+    properties:
+      target:
+        type: string
+      text:
+        type: string
+    type: object
+  responsedto.ApplicationErrorResponse:
+    properties:
+      error_code:
+        type: string
+      message:
+        type: string
+      success:
+        type: boolean
+      timestamp:
+        type: string
+    type: object
+  responsedto.ApplicationResponse:
+    properties:
+      content: {}
+      message:
+        type: string
+      success:
+        type: boolean
+      timestamp:
+        type: string
+    type: object
+  users.User:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        type: string
+      email:
+        description: NOT NULL UNIQUE
+        type: string
+      id:
+        description: UUID
+        type: string
+      password:
+        description: NOT NULL
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  users.UserResponse:
+    properties:
+      deleted_at:
+        description: omitempty omits the field if it is nil
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+    type: object
+  words.WordListSuccessWrapper:
+    properties:
+      content:
+        items:
+          $ref: '#/definitions/words.WordResponse'
+        type: array
+    type: object
+  words.WordResponse:
+    properties:
+      id:
+        type: string
+      is_saved:
+        type: boolean
+      origin:
+        type: string
+      source_lang:
+        type: string
+      target_lang:
+        type: string
+      translated:
+        type: string
+      user_id:
+        type: string
+    type: object
+  words.WordSaveSuccessWrapper:
+    properties:
+      content:
+        $ref: '#/definitions/words.WordResponse'
+    type: object
+  words.WordSavingRequest:
+    properties:
+      origin:
+        example: hello
+        type: string
+      source:
+        example: en
+        type: string
+      target:
+        example: vi
+        type: string
+      translated:
+        example: xin chào
+        type: string
+    required:
+    - origin
+    - source
+    - target
+    - translated
+    type: object
+host: localhost:8000
 info:
-  contact: {}
-paths: {}
+  contact:
+    email: '[EMAIL_ADDRESS]'
+    name: API Support
+  description: This is a sample server for Glossa.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Glossa API
+  version: "1.0"
+paths:
+  /api/auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: Logout from an account
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/auth.LogoutSuccessWrapper'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responsedto.ApplicationErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responsedto.ApplicationErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Logout from an account
+      tags:
+      - Auth
+  /api/auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: Refresh access token with refresh token
+      parameters:
+      - description: User refresh token information
+        in: body
+        name: refreshTokenRequest
+        required: true
+        schema:
+          $ref: '#/definitions/auth.RefreshTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/auth.RefreshTokenSuccessWrapper'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responsedto.ApplicationErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responsedto.ApplicationErrorResponse'
+      summary: Refresh access token
+      tags:
+      - Auth
+  /api/auth/signin:
+    post:
+      consumes:
+      - application/json
+      description: Sign in with email and password
+      parameters:
+      - description: User signin information
+        in: body
+        name: signinRequest
+        required: true
+        schema:
+          $ref: '#/definitions/auth.SigninRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/auth.SigninSuccessWrapper'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responsedto.ApplicationErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responsedto.ApplicationErrorResponse'
+      summary: Sign in to an existing account
+      tags:
+      - Auth
+  /api/auth/signup:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user with email and password
+      parameters:
+      - description: User signup information
+        in: body
+        name: signupRequest
+        required: true
+        schema:
+          $ref: '#/definitions/auth.SignupRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/auth.SignupSuccessWrapper'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responsedto.ApplicationErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responsedto.ApplicationErrorResponse'
+      summary: Create a new user
+      tags:
+      - Auth
+  /api/translate:
+    post:
+      consumes:
+      - application/json
+      description: Translate text to a target language using Google Cloud Translation
+        API
+      parameters:
+      - description: Translation request body
+        in: body
+        name: translateRequest
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.TranslateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Translate success
+          schema:
+            allOf:
+            - $ref: '#/definitions/responsedto.ApplicationResponse'
+            - properties:
+                content:
+                  type: string
+              type: object
+        "400":
+          description: Invalid JSON structure
+          schema:
+            $ref: '#/definitions/responsedto.ApplicationErrorResponse'
+        "500":
+          description: Failed to translate word
+          schema:
+            $ref: '#/definitions/responsedto.ApplicationErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Translate text
+      tags:
+      - Translator
+  /api/words:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all word translations saved by the user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/words.WordListSuccessWrapper'
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all saved words
+      tags:
+      - Words
+    post:
+      consumes:
+      - application/json
+      description: Save a word translation to the user's dictionary
+      parameters:
+      - description: Word saving request body
+        in: body
+        name: wordRequest
+        required: true
+        schema:
+          $ref: '#/definitions/words.WordSavingRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/words.WordSaveSuccessWrapper'
+        "400":
+          description: Bad request structure
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Save a translated word
+      tags:
+      - Words
+  /api/words/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a saved word translation from the user's dictionary by ID
+      parameters:
+      - description: Word ID to delete
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete a saved word
+      tags:
+      - Words
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer <your_token>" to authenticate.
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

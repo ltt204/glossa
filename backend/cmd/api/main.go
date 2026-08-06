@@ -11,10 +11,28 @@ import (
 	"glossa/modules/words"
 	"log"
 
+	_ "glossa/cmd/api/docs"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
+// @title Glossa API
+// @version 1.0
+// @description This is a sample server for Glossa.
+// @termsOfService http://swagger.io/terms/
+// @contact.name API Support
+// @contact.email [EMAIL_ADDRESS]
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+// @host localhost:8000
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Type "Bearer <your_token>" to authenticate.
 func main() {
 	ctx := context.Background()
 	ggclient, err := translator.NewGoogleClient(ctx)
@@ -71,6 +89,8 @@ func main() {
 		wordHandler.RegisterRoutes(protectedRoutes)
 		translateHandler.RegisterRoutes(protectedRoutes)
 	}
+
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	r.Run(appConfig.BaseUrl)
 }

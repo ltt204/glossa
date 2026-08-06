@@ -42,5 +42,8 @@ migrate-create:
 	fi
 	goose -dir ./internal/db/migrations create "$(filter-out $@,$(MAKECMDGOALS))" sql
 
+swag-init:
+	swag init -g cmd/api/main.go -o cmd/api/docs
+
 %:
 	@:
