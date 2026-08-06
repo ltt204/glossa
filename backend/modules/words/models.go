@@ -12,6 +12,8 @@ type Word struct {
 	Translated string
 	TargetLang string
 
+	IsSaved bool
+
 	createdAt time.Time
 	updatedAt time.Time
 

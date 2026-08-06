@@ -48,6 +48,11 @@ func Load() (*Config, error) {
 		passwdSalt = "dev-salt-change-me"
 	}
 
+	dictApi := os.Getenv("DICTIONARY_API_BASE_URL")
+	if dictApi == "" {
+		dictApi = "https://api.dictionaryapi.dev/api/v2/entries/en/"
+	}
+
 	return &Config{
 		baseUrl, allowOrigins, connectionString, jwtSecret,
 	}, nil

@@ -3,7 +3,8 @@ package translator
 import (
 	"context"
 	"glossa/internal/apperror"
-	"net/http"
+
+	"log"
 
 	"cloud.google.com/go/translate"
 )
@@ -22,7 +23,8 @@ func NewGoogleClient(ctx context.Context) (*GoogleClient, error) {
 	client, err := translate.NewClient(ctx)
 
 	if err != nil {
-		return nil, apperror.New("TRANSLATOR_ERROR", http.StatusInternalServerError, "Failed to create translator client", err)
+		log.Fatal("Failed to create Google Client")
+		return nil, apperror.InternalServerError.WithMessage("Something went wrong.")
 	}
 
 	return &GoogleClient{

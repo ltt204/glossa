@@ -17,22 +17,9 @@ func NewTranslationService(client *GoogleClient) (*TranslationService, error) {
 	return &TranslationService{Client: client}, nil
 }
 
-// Functions for using translation services
-
-func (svc *TranslationService) DetectLanguage() {
-
-}
-
 func (svc *TranslationService) Translate(ctx context.Context, input string, target string) (string, error) {
 	langTag := language.Make(target)
 
-	// Retry with exponential backoff to handle rate limit errors (403 userRateLimitExceeded).
-	//
-	// Google's Translation API has a per-second/per-100s rate limit that is separate
-	// from the daily quota. When hit, the right response is to wait and retry —
-	// not to fail immediately.
-	//
-	// Attempts: 1st try → wait 1s → 2nd try → wait 2s → 3rd try → wait 4s → give up
 	maxAttempts := 4
 	backoff := time.Second
 
@@ -58,7 +45,6 @@ func (svc *TranslationService) Translate(ctx context.Context, input string, targ
 		}
 	}
 
-	// This line is never reached but the compiler requires it
 	return "", fmt.Errorf("translation failed after %d attempts", maxAttempts)
 }
 
