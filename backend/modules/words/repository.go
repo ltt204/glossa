@@ -28,6 +28,8 @@ func (wr *WordRepository) Save(ctx context.Context, word Word) (Word, error) {
 	`
 
 	currentUserId := ctx.Value("user_id").(string)
+	fmt.Println("current user id:", currentUserId)
+
 	var savedWord Word
 	err := wr.pool.QueryRow(ctx, query, currentUserId, word.Origin, word.SourceLang, word.Translated, word.TargetLang, true).Scan(
 		&savedWord.Id,
@@ -57,7 +59,7 @@ func (wr *WordRepository) Update(ctx context.Context, word Word) (string, error)
 func (wr *WordRepository) GetAll(ctx context.Context) ([]Word, error) {
 	currentUserId := ctx.Value("user_id").(string)
 	log.Println(currentUserId)
-	var query = `SELECT ` + wordColumns + ` FROM words WHERE user_id = $1`
+	var query = `SELECT ` + wordColumns + ` FROM words WHERE user_id = $1 AND (deleted_at IS NULL AND is_saved = true)`
 
 	result, err := wr.pool.Query(ctx, query, currentUserId)
 	if err != nil {
@@ -166,7 +168,9 @@ func (wr *WordRepository) Delete(ctx context.Context, wordId string) error {
 		return ErrWordNotFound
 	}
 
-	query := `UPDATE words SET deleted_at = NOW() WHERE id = $1 AND user_id = $2`
+	query := `UPDATE words SET
+		deleted_at = NOW(), is_saved = false
+		WHERE id = $1 AND user_id = $2`
 
 	tag, err := wr.pool.Exec(ctx, query, wordId, currentUserId)
 
