@@ -12,6 +12,7 @@ type Config struct {
 	AllowOrigins     []string
 	ConnectionString string
 	JwtSecret        string
+	DictApi          string
 }
 
 func Load() (*Config, error) {
@@ -54,6 +55,6 @@ func Load() (*Config, error) {
 	}
 
 	return &Config{
-		baseUrl, allowOrigins, connectionString, jwtSecret,
+		baseUrl, allowOrigins, connectionString, jwtSecret, dictApi,
 	}, nil
 }

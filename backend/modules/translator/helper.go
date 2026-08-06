@@ -1,6 +1,7 @@
 package translator
 
 import (
+	"encoding/json"
 	"errors"
 	"strings"
 
@@ -21,4 +22,12 @@ func Join(inputs []translate.Translation) string {
 // It lets service.go stay clean without importing "errors" directly.
 func errorAs(err error, target any) bool {
 	return errors.As(err, target)
+}
+
+func ParseDictionaryEntry(data []byte) ([]DictionaryEntry, error) {
+	var entry []DictionaryEntry
+	if err := json.Unmarshal(data, &entry); err != nil {
+		return nil, err
+	}
+	return entry, nil
 }

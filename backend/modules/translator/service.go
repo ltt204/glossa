@@ -3,6 +3,9 @@ package translator
 import (
 	"context"
 	"fmt"
+	"io"
+	"log"
+	"net/http"
 	"time"
 
 	"golang.org/x/text/language"
@@ -10,11 +13,12 @@ import (
 )
 
 type TranslationService struct {
-	Client *GoogleClient
+	Client  *GoogleClient
+	DictApi string
 }
 
-func NewTranslationService(client *GoogleClient) (*TranslationService, error) {
-	return &TranslationService{Client: client}, nil
+func NewTranslationService(client *GoogleClient, dictApi string) (*TranslationService, error) {
+	return &TranslationService{Client: client, DictApi: dictApi}, nil
 }
 
 func (svc *TranslationService) Translate(ctx context.Context, input string, target string) (string, error) {
@@ -26,6 +30,7 @@ func (svc *TranslationService) Translate(ctx context.Context, input string, targ
 	for attempt := 1; attempt <= maxAttempts; attempt++ {
 		result, err := svc.Client.client.Translate(ctx, []string{input}, langTag, nil)
 		if err == nil {
+			log.Println("Translated Word: ", result)
 			return Join(result), nil
 		}
 
@@ -46,6 +51,32 @@ func (svc *TranslationService) Translate(ctx context.Context, input string, targ
 	}
 
 	return "", fmt.Errorf("translation failed after %d attempts", maxAttempts)
+}
+
+// TODO: Properly handle parsing object since I declared all other structure in model.go of Translator module.
+func (svc *TranslationService) GetWordDefinition(ctx context.Context, word string) (string, error) {
+	response, err := http.Get(svc.DictApi + word)
+	if err != nil {
+		return "", err
+	}
+	defer response.Body.Close()
+	if response.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("dictionary api error: %s", response.Status)
+	}
+
+	body, err := io.ReadAll(response.Body)
+	if err != nil {
+		log.Fatalf("Failed to read body: %v", err)
+	}
+
+	result, err := ParseDictionaryEntry(body)
+	if err != nil {
+		return "", err
+	}
+
+	fmt.Println("Translated Word: ", result)
+
+	return result[0].Meanings[0].Definitions[0].Definition, nil
 }
 
 // isRateLimitError returns true when Google rejected the request due to rate

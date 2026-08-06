@@ -64,7 +64,7 @@ func main() {
 	authService := auth.NewAuthService(authRepo, tokenRepo)
 	authHandler := auth.NewHandler(*authService)
 
-	translationSvc, err := translator.NewTranslationService(ggclient)
+	translationSvc, err := translator.NewTranslationService(ggclient, appConfig.DictApi)
 	translateHandler := translator.NewHandler(translationSvc)
 
 	var r *gin.Engine = gin.Default()
