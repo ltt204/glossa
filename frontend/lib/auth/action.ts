@@ -61,3 +61,22 @@ export async function signin(
     redirect("/");
 }
 
+export async function logout() {
+    const cookieStore = await cookies();
+    const accessToken = cookieStore.get("access_token")?.value;
+
+    if (accessToken) {
+        await fetch(`${API_URL}/api/auth/logout`, {
+            method: "POST",
+            headers: {
+                "Authorization" : `Bearer ${accessToken}`,
+            },
+            cache: "no-store"
+        }).catch(() => null)
+    }
+
+    cookieStore.delete("access_token")
+    cookieStore.delete("refresh_token")
+
+    redirect("/login")
+}

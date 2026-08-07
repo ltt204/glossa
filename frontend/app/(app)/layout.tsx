@@ -8,13 +8,9 @@ export default function RootLayout({
 	children: React.ReactNode
 }>) {
 	return (
-		<html lang="en" className={cn('h-full antialiased')}>
-			<body className="min-h-full flex flex-col font-sans">
-				<TooltipProvider delayDuration={200}>
-					<Navigation />
-					{children}
-				</TooltipProvider>
-			</body>
-		</html>
+		<>
+			<Navigation />
+			{children}
+		</>
 	)
 }
