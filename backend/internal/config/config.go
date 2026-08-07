@@ -17,14 +17,11 @@ type Config struct {
 }
 
 func Load() (*Config, error) {
-	// Load .env file if it exists.
-	// In Docker, environment variables are injected directly, so no file is needed.
-	// We intentionally ignore the error here.
 	godotenv.Load()
 
 	baseUrl := os.Getenv("BASE_URL")
 	if baseUrl == "" {
-		baseUrl = "localhost:8000"
+		baseUrl = ":8000"
 	}
 
 	raw := os.Getenv("ALLOW_ORIGINS")

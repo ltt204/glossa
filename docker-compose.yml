@@ -3,6 +3,7 @@ services:
   # ── PostgreSQL ──────────────────────────────────────────────
   db:
     container_name: glossa_db
+    hostname: glossa_db
     image: postgres:17
     environment:
       POSTGRES_USER: postgres
@@ -17,32 +18,33 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - glossa_network
 
   # ── Go backend (dev, with hot reload) ──────────────────────
   backend:
     container_name: glossa_backend
+    hostname: glossa_backend
     build:
       context: ./backend
       target: dev          # uses the "dev" stage in the Dockerfile
     ports:
       - "8000:8000"
-    environment:
-      # Listen on all interfaces inside the container (not just localhost)
-      BASE_URL: "0.0.0.0:8000"
-      # Point to the postgres service above (use the service name "db" as the host)
-      CONNECTION_STRING: "postgres://postgres:postgres@db:5432/glossa?sslmode=disable"
-      # Tell the Google Cloud SDK where to find your service account key
-      GOOGLE_APPLICATION_CREDENTIALS: "/app/service-account.json"
+    env_file:
+      - ./backend/glossa_backend.env
     volumes:
-      # Mount source code so Air sees your edits and rebuilds automatically
       - ./backend:/app
-      # Keep the compiled binary cache inside the container
-      # (prevents the host from overwriting it with an empty dir)
       - backend_tmp:/app/tmp
     depends_on:
       db:
         condition: service_healthy   # wait until postgres is ready
+    networks:
+      - glossa_network
 
 volumes:
   glossa_pg:
   backend_tmp:
+
+networks:
+  glossa_network:
+
