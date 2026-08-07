@@ -50,7 +50,7 @@ func (h *AuthHandler) handleSignup(ctx *gin.Context) {
 		ctx.JSON(400, responsedto.ErrorResponse(err))
 		return
 	} else {
-		ctx.JSON(200, gin.H{"message": "User created successfully", "user": result})
+		ctx.JSON(200, responsedto.SuccessResponse("User created successfully", result))
 	}
 }
 
@@ -75,7 +75,7 @@ func (h *AuthHandler) handleSignin(ctx *gin.Context) {
 		ctx.JSON(400, responsedto.ErrorResponse(err))
 		return
 	} else {
-		ctx.JSON(200, gin.H{"message": "User signed in successfully", "user": result})
+		ctx.JSON(200, responsedto.SuccessResponse("User signed in successfully", result))
 	}
 }
 
@@ -100,7 +100,7 @@ func (h *AuthHandler) handleRefreshToken(ctx *gin.Context) {
 		ctx.JSON(400, responsedto.ErrorResponse(err))
 		return
 	} else {
-		ctx.JSON(200, gin.H{"message": "User signed in successfully", "user": result})
+		ctx.JSON(200, responsedto.SuccessResponse("Token refreshed successfully", result))
 	}
 }
 
@@ -120,6 +120,6 @@ func (h *AuthHandler) handleLogout(ctx *gin.Context) {
 		ctx.JSON(400, responsedto.ErrorResponse(err))
 		return
 	} else {
-		ctx.JSON(200, gin.H{"message": "User signed out successfully", "user": result})
+		ctx.JSON(200, responsedto.SuccessResponse("User signed out successfully", result))
 	}
 }

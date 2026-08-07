@@ -1,11 +1,11 @@
 package translator
 
 import (
-	"encoding/json"
 	"errors"
 	"strings"
 
 	"cloud.google.com/go/translate"
+	"google.golang.org/api/googleapi"
 )
 
 func Join(inputs []translate.Translation) string {
@@ -24,10 +24,10 @@ func errorAs(err error, target any) bool {
 	return errors.As(err, target)
 }
 
-func ParseDictionaryEntry(data []byte) ([]DictionaryEntry, error) {
-	var entry []DictionaryEntry
-	if err := json.Unmarshal(data, &entry); err != nil {
-		return nil, err
+func isRateLimitError(err error) bool {
+	var apiErr *googleapi.Error
+	if ok := errorAs(err, &apiErr); ok {
+		return apiErr.Code == 403 || apiErr.Code == 429
 	}
-	return entry, nil
+	return false
 }

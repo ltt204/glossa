@@ -6,6 +6,7 @@ import (
 	"glossa/internal/db"
 	"glossa/internal/middleware"
 	"glossa/modules/auth"
+	"glossa/modules/definition"
 	"glossa/modules/translator"
 	"glossa/modules/users"
 	"glossa/modules/words"
@@ -64,8 +65,12 @@ func main() {
 	authService := auth.NewAuthService(authRepo, tokenRepo)
 	authHandler := auth.NewHandler(*authService)
 
-	translationSvc, err := translator.NewTranslationService(ggclient, appConfig.DictApi)
+	definitionService := definition.NewWordDefinitionService(appConfig.DictApi)
+
+	translationSvc, err := translator.NewTranslationService(ggclient, appConfig.DictApi, definitionService)
 	translateHandler := translator.NewHandler(translationSvc)
+
+	// dictionaryHandler := definition.NewHandler(dictionarySvc)
 
 	var r *gin.Engine = gin.Default()
 	r.Use(cors.New(cors.Config{
