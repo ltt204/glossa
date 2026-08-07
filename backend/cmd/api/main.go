@@ -11,6 +11,9 @@ import (
 	"glossa/modules/users"
 	"glossa/modules/words"
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
 
 	_ "glossa/cmd/api/docs"
 
@@ -36,7 +39,7 @@ import (
 // @description Type "Bearer <your_token>" to authenticate.
 func main() {
 	ctx := context.Background()
-	ggclient, err := translator.NewGoogleClient(ctx)
+	translationClient, err := translator.NewGoogleClient(ctx)
 	if err != nil {
 		log.Fatal("Failed to initialize translation client: ", err)
 	}
@@ -66,14 +69,11 @@ func main() {
 	authHandler := auth.NewHandler(*authService)
 
 	definitionService := definition.NewWordDefinitionService(appConfig.DictApi)
-
-	translationSvc, err := translator.NewTranslationService(ggclient, appConfig.DictApi, definitionService)
+	translationSvc, err := translator.NewTranslationService(translationClient, appConfig.DictApi, appConfig.ProjectID, definitionService)
 	translateHandler := translator.NewHandler(translationSvc)
 
-	// dictionaryHandler := definition.NewHandler(dictionarySvc)
-
-	var r *gin.Engine = gin.Default()
-	r.Use(cors.New(cors.Config{
+	router := gin.Default()
+	router.Use(cors.New(cors.Config{
 		AllowOrigins:     appConfig.AllowOrigins,
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
@@ -82,7 +82,7 @@ func main() {
 		MaxAge:           12 * 3600, // 12 hours
 	}))
 
-	routes := r.Group("/api")
+	routes := router.Group("/api")
 	{
 		authHandler.RegisterRoutes(routes)
 	}
@@ -95,7 +95,18 @@ func main() {
 		translateHandler.RegisterRoutes(protectedRoutes)
 	}
 
-	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	r.Run(appConfig.BaseUrl)
+	router.Run(appConfig.BaseUrl)
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+
+	<-quit
+
+	if err := translationClient.Close(); err != nil {
+		log.Fatal("Failed to close translation client: ", err)
+	}
+
+	log.Println("Server stopped properly")
 }

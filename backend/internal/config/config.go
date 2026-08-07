@@ -13,6 +13,7 @@ type Config struct {
 	ConnectionString string
 	JwtSecret        string
 	DictApi          string
+	ProjectID        string
 }
 
 func Load() (*Config, error) {
@@ -54,7 +55,17 @@ func Load() (*Config, error) {
 		dictApi = "https://api.dictionaryapi.dev/api/v2/entries/en/"
 	}
 
+	projectId := os.Getenv("PROJECT_ID")
+	if projectId == "" {
+		projectId = "glossa"
+	}
+
 	return &Config{
-		baseUrl, allowOrigins, connectionString, jwtSecret, dictApi,
+		BaseUrl:          baseUrl,
+		AllowOrigins:     allowOrigins,
+		ConnectionString: connectionString,
+		JwtSecret:        jwtSecret,
+		DictApi:          dictApi,
+		ProjectID:        projectId,
 	}, nil
 }

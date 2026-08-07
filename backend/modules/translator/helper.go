@@ -4,15 +4,15 @@ import (
 	"errors"
 	"strings"
 
-	"cloud.google.com/go/translate"
+	"cloud.google.com/go/translate/apiv3/translatepb"
 	"google.golang.org/api/googleapi"
 )
 
-func Join(inputs []translate.Translation) string {
+func Join(inputs []*translatepb.Translation) string {
 	var result strings.Builder
 
 	for _, input := range inputs {
-		result.WriteString(input.Text)
+		result.WriteString(input.GetTranslatedText())
 	}
 
 	return result.String()
