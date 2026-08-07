@@ -56,7 +56,7 @@ async function handle<T>(res: Response): Promise<T> {
   if (!res.ok) {
     const body = await res.json().catch(() => null);
     throw new WordsApiError(
-      body?.error || `Request failed: ${res.status}`,
+      body?.message || `Request failed: ${res.status}`,
       res.status
     );
   }

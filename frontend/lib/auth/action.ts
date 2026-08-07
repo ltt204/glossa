@@ -1,0 +1,63 @@
+"use server"
+
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+export type LoginState = {message: string}
+
+export async function signin(
+    _prevState: LoginState, 
+    formData: FormData
+) : Promise<LoginState> {
+    
+    const email = String(formData.get("email") ?? "");
+    const password = String(formData.get("password") ?? "");
+
+    if (!email || !password) {
+        return { message: "All fields are required"}
+    }
+
+    const res = await fetch (`${API_URL}/api/auth/signin`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json" },
+        body: JSON.stringify({email, password}),
+        cache: "no-store"
+    }).catch(() => null)
+
+    if (!res) {
+        return {message: "Could not reach the server."}
+    }
+
+    const body = await res.json().catch(() => null)
+    if (!res.ok || typeof body !== 'object' || body === null) {
+        return { message: body?.message ?? "Sign in failed." }
+    }
+
+    const {access_token, refresh_token} = body?.content ?? {};
+    if (!access_token || !refresh_token) {
+        return { message: "Sign in Failed."}
+    }
+
+    const cookieStore = await cookies();
+    const secure = process.env.NODE_ENV === "production"
+
+    cookieStore.set("access_token", access_token, {
+        httpOnly: true,
+        secure,
+        sameSite: "lax",
+        path: "/",
+        maxAge: 7 * 24 * 60 * 60
+    })
+
+    cookieStore.set("refresh_token", refresh_token, {
+        httpOnly: true,
+        secure,
+        sameSite: "lax",
+        path: "/",
+        maxAge: 15 * 60
+    })
+
+    redirect("/");
+}
+
