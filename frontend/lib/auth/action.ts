@@ -61,6 +61,39 @@ export async function signin(
     redirect("/");
 }
 
+export type SignUpState = {message: string}
+
+export async function signup (
+    _previousState: SignUpState,
+    formData: FormData
+) : Promise<SignUpState> {
+    // const name = String(formData.get("name") ?? "")
+    const email = String(formData.get("email") ?? "")
+    const password = String(formData.get("password") ?? "")
+
+    if (!email || !password) {
+        return { message: "All fields are required"}
+    }
+
+    const res = await fetch (`${API_URL}/api/auth/signup`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json" },
+        body: JSON.stringify({email, password}),
+        cache: "no-store"
+    }).catch(() => null)
+
+    if (!res) {
+        return { message: "Could not reach the server."}
+    }
+
+    const body = await res.json().catch(() => null)
+    if (!res.ok || typeof body !== 'object' || body === null) {
+        return { message: body?.message ?? "Sign up failed." }
+    }
+
+    redirect("/login");
+}
+
 export async function logout() {
     const cookieStore = await cookies();
     const accessToken = cookieStore.get("access_token")?.value;

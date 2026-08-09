@@ -1,0 +1,55 @@
+'use client'
+
+import { SignUpState, signup } from '@/lib/auth/action'
+import { useActionState } from 'react'
+import { Label } from '../ui/label'
+import { Input } from '../ui/input'
+import { Button } from '../ui/button'
+import { Separator } from '../ui/separator'
+
+const initialState: SignUpState = { message: '' }
+
+export default function SignUpForm() {
+	const [state, action, pending] = useActionState(signup, initialState)
+
+	return (
+		<form action={action} className="space-y-4">
+			<div>
+				<Label htmlFor="name">Name</Label>
+				<Input type="text" id="name" name="name" required autoComplete="name" />
+			</div>
+			<div>
+				<Label htmlFor="email">Email</Label>
+				<Input
+					type="email"
+					id="email"
+					name="email"
+					required
+					autoComplete="email"
+				/>
+			</div>
+			<div>
+				<Label htmlFor="password">Password</Label>
+				<Input type="password" id="password" name="password" required />
+			</div>
+			{state.message && (
+				<p aria-live="polite" className="w-full">
+					{state.message}
+				</p>
+			)}
+			<Button disabled={pending} type="submit" className="w-full">
+				{pending ? 'Signing up...' : 'Sign Up'}
+			</Button>
+
+			<Separator />
+			<div className="space-y-2">
+				<span>
+					Already have an account?{' '}
+					<a className="text-primary link" href="/login">
+						Log in
+					</a>
+				</span>
+			</div>
+		</form>
+	)
+}
