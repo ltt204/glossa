@@ -1,26 +1,21 @@
 'use server'
 
 import { apiFetch } from "../api-server"
-import type { Translate, TranslateResult, WordDefinitions } from "./models"
+import type { TranslateResult } from "./models"
 
 export async function translate(
     text: string,
     target: string
 ) : Promise<TranslateResult> {
-    const res = await apiFetch(`api/translate`, {
+    const res = await apiFetch<TranslateResult>(`api/translate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: text, target: target }),
     })
 
-    const data = await res.json().then((res: {content: {translations: Translate[], definitions: WordDefinitions}, error_code: string}) => {
-        const {translations, definitions} = res.content || { translations: [], definitions: [] }
-        const translateResult: TranslateResult = {
-            translations: translations,
-            definitions: definitions,
-        }
-        return translateResult
-    })
+    if (res.status !== 200 || !res.content) {
+        throw Error(res.message)   
+    }
 
-    return data
+    return res.content
 }

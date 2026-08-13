@@ -7,7 +7,7 @@ import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 import { Separator } from '../ui/separator'
 
-const initialState: LoginState = { message: '' }
+const initialState: LoginState = { isSuccess: true, message: '' }
 
 export function LoginForm() {
 	const [state, formAction, pending] = useActionState(signin, initialState)
@@ -38,7 +38,7 @@ export function LoginForm() {
 					></Input>
 				</div>
 
-				{state.message && (
+				{!state.isSuccess && (
 					<p aria-live="polite" className="w-full text-destructive">
 						{state.message}
 					</p>

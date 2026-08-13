@@ -1,151 +1,132 @@
-"use server"
+'use server'
 
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
-import { apiFetch } from "../api-server";
+import { cookies } from 'next/headers'
+import { redirect } from 'next/navigation'
+import { apiFetch } from '../api-server'
+import { SignInResponse } from './models'
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-export type LoginState = {message: string}
+export type LoginState = {
+	isSuccess: boolean
+	message: string
+}
 
 export async function signin(
-    _prevState: LoginState, 
-    formData: FormData
-) : Promise<LoginState> {
-    
-    const email = String(formData.get("email") ?? "");
-    const password = String(formData.get("password") ?? "");
+	_prevState: LoginState,
+	formData: FormData,
+): Promise<LoginState> {
+	const email = String(formData.get('email') ?? '')
+	const password = String(formData.get('password') ?? '')
 
-    if (!email || !password) {
-        return { message: "All fields are required"}
-    }
+	if (!email || !password) {
+		return {
+			isSuccess: false,
+			message: 'All fields are required',
+		}
+	}
 
-    const res = await fetch (`${API_URL}/api/auth/signin`, {
-        method: "POST",
-        headers: {"Content-Type": "application/json" },
-        body: JSON.stringify({email, password}),
-        cache: "no-store"
-    }).catch(() => null)
+	const res = await apiFetch<SignInResponse | null>(`api/auth/signin`, {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({
+			email: email,
+			password: password,
+		}),
+		cache: 'no-store',
+	})
+	console.log('Signin Response: ', res)
+	if (res.status !== 200 || !res.content) {
+		return { isSuccess: res.success, message: res.message ?? 'Sign in failed.' }
+	}
 
-    if (!res) {
-        return {message: "Could not reach the server."}
-    }
+	const { accessToken, refreshToken } = res.content
+	if (!accessToken || !refreshToken) {
+		return { isSuccess: false, message: 'Sign in Failed.' }
+	}
 
-    const body = await res.json().catch(() => null)
-    if (!res.ok || typeof body !== 'object' || body === null) {
-        return { message: body?.message ?? "Sign in failed." }
-    }
+	await setCredentialsCookie(accessToken, refreshToken)
 
-    const {access_token, refresh_token} = body?.content ?? {};
-    if (!access_token || !refresh_token) {
-        return { message: "Sign in Failed."}
-    }
-
-    await cookieSetter(access_token, refresh_token)
-
-    redirect("/");
+	redirect('/translate')
 }
 
-export async function refreshAccessToken(){
-    const cookieStore = await cookies();
-    const currentRefreshToken = cookieStore.get("refresh_token")?.value;
+export type SignUpState = { message: string }
 
-    const res = await apiFetch("api/auth/refresh", {
-        method: "POST",
-        headers: {"Content-Type": "application/json" },
-        body: JSON.stringify({refresh_token: currentRefreshToken}),
-        cache: "no-store"
-    })
+export async function signup(
+	_previousState: SignUpState,
+	formData: FormData,
+): Promise<SignUpState> {
+	// const name = String(formData.get("name") ?? "")
+	const email = String(formData.get('email') ?? '')
+	const password = String(formData.get('password') ?? '')
 
-    const data = await res.json().catch(() => null)
-    if (!res.ok || typeof data !== 'object' || data === null) {
-        return { message: data?.message ?? "Refresh token failed." }
-    }
+	if (!email || !password) {
+		return { message: 'All fields are required' }
+	}
 
-    const {access_token, refresh_token} = data.content;
+	const res = await fetch(`/api/auth/signup`, {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({ email, password }),
+		cache: 'no-store',
+	}).catch(() => null)
 
-    await cookieSetter(access_token, refresh_token);
+	if (!res) {
+		return { message: 'Could not reach the server.' }
+	}
+
+	const body = await res.json().catch(() => null)
+	if (!res.ok || typeof body !== 'object' || body === null) {
+		return { message: body?.message ?? 'Sign up failed.' }
+	}
+
+	const { accessToken, refreshToken } = body?.content ?? {}
+	if (!accessToken || !refreshToken) {
+		return { message: 'Sign up Failed.' }
+	}
+
+	await setCredentialsCookie(accessToken, refreshToken)
+
+	redirect('/translate')
 }
 
-export type SignUpState = {message: string}
+async function setCredentialsCookie(accessToken: string, refreshToken: string) {
+	const cookieStore = await cookies()
+	const secure = process.env.NODE_ENV === 'production'
 
-export async function signup (
-    _previousState: SignUpState,
-    formData: FormData
-) : Promise<SignUpState> {
-    // const name = String(formData.get("name") ?? "")
-    const email = String(formData.get("email") ?? "")
-    const password = String(formData.get("password") ?? "")
+	cookieStore.set('access_token', accessToken, {
+		httpOnly: true,
+		secure,
+		sameSite: 'lax',
+		path: '/',
+		maxAge: 15 * 60,
+	})
 
-    if (!email || !password) {
-        return { message: "All fields are required"}
-    }
+	cookieStore.set('refresh_token', refreshToken, {
+		httpOnly: true,
+		secure,
+		sameSite: 'lax',
+		path: '/',
+		maxAge: 7 * 24 * 60 * 60,
+	})
 
-    const res = await fetch (`${API_URL}/api/auth/signup`, {
-        method: "POST",
-        headers: {"Content-Type": "application/json" },
-        body: JSON.stringify({email, password}),
-        cache: "no-store"
-    }).catch(() => null)
-
-    if (!res) {
-        return { message: "Could not reach the server."}
-    }
-
-    const body = await res.json().catch(() => null)
-    if (!res.ok || typeof body !== 'object' || body === null) {
-        return { message: body?.message ?? "Sign up failed." }
-    }
-
-    const {access_token, refresh_token} = body?.content ?? {};
-    if (!access_token || !refresh_token) {
-        return { message: "Sign up Failed."}
-    }
-
-    await cookieSetter(access_token, refresh_token)
-
-    redirect("/");
+	console.log('Successfully set cookies!')
 }
-
-export async function cookieSetter(
-    access_token: string,
-    refresh_token: string
-) {
-    const cookieStore = await cookies();
-    const secure = process.env.NODE_ENV === "production"
-
-    cookieStore.set("access_token", access_token, {
-        httpOnly: true,
-        secure,
-        sameSite: "lax",
-        path: "/",
-        maxAge: 15 * 60
-    })
-
-    cookieStore.set("refresh_token", refresh_token, {
-        httpOnly: true,
-        secure,
-        sameSite: "lax",
-        path: "/",
-        maxAge: 7 * 24 * 60 * 60
-    })
-} 
 
 export async function logout() {
-    const cookieStore = await cookies();
-    const accessToken = cookieStore.get("access_token")?.value;
+	const cookieStore = await cookies()
+	const accessToken = cookieStore.get('accessToken')?.value
 
-    if (accessToken) {
-        await fetch(`${API_URL}/api/auth/logout`, {
-            method: "POST",
-            headers: {
-                "Authorization" : `Bearer ${accessToken}`,
-            },
-            cache: "no-store"
-        }).catch(() => null)
-    }
+	if (accessToken) {
+		await fetch(`/api/auth/logout`, {
+			method: 'POST',
+			headers: {
+				Authorization: `Bearer ${accessToken}`,
+			},
+			cache: 'no-store',
+		}).catch(() => null)
+	}
 
-    cookieStore.delete("access_token")
-    cookieStore.delete("refresh_token")
+	cookieStore.delete('accessToken')
+	cookieStore.delete('refreshToken')
 
-    redirect("/login")
+	redirect('/login')
 }
