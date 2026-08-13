@@ -81,14 +81,15 @@ func (us *AuthService) RefreshToken(ctx context.Context, req RefreshTokenRequest
 		)
 	}
 
-	accessToken, err := us.refRepo.GenerateAcccessTokens(ctx, req.RefreshToken)
+	accessToken, refreshToken, err := us.refRepo.GenerateAcccessTokens(ctx, req.RefreshToken)
 	if err != nil {
 		apperr := apperror.NewAppError(err)
 		return RefreshTokenResponse{}, apperr
 	}
 
 	return RefreshTokenResponse{
-		AccessToken: accessToken,
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
 	}, nil
 }
 

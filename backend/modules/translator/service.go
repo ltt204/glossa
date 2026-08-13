@@ -38,7 +38,10 @@ func (svc *TranslationService) Translate(ctx context.Context, input string, targ
 	eg.Go(func() error {
 		res, err := svc.fetchGoogleTranslate(egcx, input, target)
 		if err == nil {
-			result.Translations = res
+			for _, t := range res {
+				result.Translations = append(result.Translations, toTranslationResponse(t))
+			}
+
 			log.Println("Translation Service: ", result)
 			return nil
 		}

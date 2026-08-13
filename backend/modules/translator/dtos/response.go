@@ -2,11 +2,14 @@ package dtos
 
 import (
 	"glossa/modules/definition"
-
-	"cloud.google.com/go/translate/apiv3/translatepb"
 )
 
 type WordResult struct {
-	Translations []*translatepb.Translation `json:"translations"`
+	Translations []Translation              `json:"translations"`
 	Definitions  definition.WordDefinitions `json:"definitions"`
+}
+
+type Translation struct {
+	TranslatedText       string `json:"translatedText"`
+	DetectedLanguageCode string `json:"detectedLanguageCode"`
 }

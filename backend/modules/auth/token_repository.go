@@ -16,7 +16,7 @@ type TokenRepository interface {
 	Save(ctx context.Context, req CreateRefreshTokenRequest) (RefreshToken, error)
 	RemoveAllByUserId(ctx context.Context, userId string) (bool, error)
 	GenerateTokens(ctx context.Context, userID string) (string, string, error)
-	GenerateAcccessTokens(ctx context.Context, refreshToken string) (string, error)
+	GenerateAcccessTokens(ctx context.Context, refreshToken string) (string, string, error)
 }
 
 type tokenRepository struct {
@@ -87,7 +87,7 @@ func (refRepo *tokenRepository) GenerateTokens(ctx context.Context, userID strin
 	return accessToken, rawRefToken, nil
 }
 
-func (refRepo *tokenRepository) GenerateAcccessTokens(ctx context.Context, refreshToken string) (string, error) {
+func (refRepo *tokenRepository) GenerateAcccessTokens(ctx context.Context, refreshToken string) (string, string, error) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
@@ -97,19 +97,15 @@ func (refRepo *tokenRepository) GenerateAcccessTokens(ctx context.Context, refre
 	var refreshTokenDO RefreshToken
 	row := refRepo.pool.QueryRow(ctx, "SELECT * FROM refresh_token WHERE token_hash = $1", hashedRefreshToken)
 	if err := row.Scan(&refreshTokenDO.ID, &refreshTokenDO.UserID, &refreshTokenDO.TokenHash, &refreshTokenDO.CreatedAt, &refreshTokenDO.UpdatedAt, &refreshTokenDO.DeletedAt); err != nil {
-		return "", apperror.InternalServerError.WithMessage("Something went wrong")
+		return "", "", apperror.InternalServerError.WithMessage("Something went wrong")
 	}
 
-	claims := jwt.MapClaims{
-		"sub": refreshTokenDO.UserID,
-		"iat": time.Now().Unix(),
-		"exp": time.Now().Add(15 * time.Minute).Unix(),
-	}
+	accessToken, refreshToken, err := refRepo.GenerateTokens(ctx, refreshTokenDO.UserID)
 
-	accessToken, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString(refRepo.jwtSecretKey)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
-	return accessToken, nil
+	refRepo.RemoveAllByUserId(ctx, refreshTokenDO.UserID)
+	return accessToken, refreshToken, nil
 }

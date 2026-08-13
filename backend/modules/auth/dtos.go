@@ -26,20 +26,21 @@ type SigninResponse struct {
 
 // REFRESH TOKEN DTOs
 type RevokeAllRefreshTokensRequest struct {
-	UserId string `json:"user_id" binding:"required"`
+	UserId string `json:"userID" binding:"required"`
 }
 
 type RefreshTokenRequest struct {
-	RefreshToken string `json:"refresh_token" binding:"required"`
+	RefreshToken string `json:"refreshToken" binding:"required"`
 }
 
 type RefreshTokenResponse struct {
-	AccessToken string `json:"access_token"`
+	AccessToken  string `json:"accessToken"`
+	RefreshToken string `json:"refreshToken"`
 }
 
 type CreateRefreshTokenRequest struct {
-	UserId    string `json:"user_id" binding:"required"`
-	TokenHash string `json:"token_hash" binding:"required"`
+	UserId    string `json:"userId" binding:"required"`
+	TokenHash string `json:"tokenHash" binding:"required"`
 }
 
 // Success Response Wrappers for Swagger

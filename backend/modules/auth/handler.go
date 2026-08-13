@@ -96,6 +96,7 @@ func (h *AuthHandler) handleRefreshToken(ctx *gin.Context) {
 		ctx.JSON(400, responsedto.ErrorResponse(apperror.New("BAD_REQUEST", 400, "Invalid request", err)))
 		return
 	}
+
 	if result, err := h.authSvc.RefreshToken(ctx, req); err != nil {
 		ctx.JSON(400, responsedto.ErrorResponse(err))
 		return
