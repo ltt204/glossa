@@ -24,6 +24,11 @@ func (svc *WordDefinitionService) GetWordDefinition(ctx context.Context, word st
 		return result, err
 	}
 	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusNotFound {
+		return result, nil
+	}
+
 	if response.StatusCode != http.StatusOK {
 		return result, fmt.Errorf("dictionary api error: %s", response.Status)
 	}
