@@ -12,5 +12,5 @@ type CreateUserRequest struct {
 type UserResponse struct {
 	ID        string     `json:"id"`
 	Email     string     `json:"email"`
-	DeletedAt *time.Time `json:"deleted_at,omitempty"` // omitempty omits the field if it is nil
+	DeletedAt *time.Time `json:"deletedAt,omitempty"` // omitempty omits the field if it is nil
 }

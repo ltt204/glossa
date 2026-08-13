@@ -235,7 +235,7 @@
                                     "type": "object",
                                     "properties": {
                                         "content": {
-                                            "type": "string"
+                                            "$ref": "#/definitions/dtos.Translation"
                                         }
                                     }
                                 }
@@ -402,10 +402,10 @@
         "auth.RefreshTokenRequest": {
             "type": "object",
             "required": [
-                "refresh_token"
+                "refreshToken"
             ],
             "properties": {
-                "refresh_token": {
+                "refreshToken": {
                     "type": "string"
                 }
             }
@@ -413,7 +413,10 @@
         "auth.RefreshTokenResponse": {
             "type": "object",
             "properties": {
-                "access_token": {
+                "accessToken": {
+                    "type": "string"
+                },
+                "refreshToken": {
                     "type": "string"
                 }
             }
@@ -448,10 +451,10 @@
         "auth.SigninResponse": {
             "type": "object",
             "properties": {
-                "access_token": {
+                "accessToken": {
                     "type": "string"
                 },
-                "refresh_token": {
+                "refreshToken": {
                     "type": "string"
                 },
                 "user": {
@@ -489,10 +492,10 @@
         "auth.SignupResponse": {
             "type": "object",
             "properties": {
-                "access_token": {
+                "accessToken": {
                     "type": "string"
                 },
-                "refresh_token": {
+                "refreshTtoken": {
                     "type": "string"
                 },
                 "user": {
@@ -519,6 +522,17 @@
                     "type": "string"
                 },
                 "text": {
+                    "type": "string"
+                }
+            }
+        },
+        "dtos.Translation": {
+            "type": "object",
+            "properties": {
+                "detectedLanguageCode": {
+                    "type": "string"
+                },
+                "translatedText": {
                     "type": "string"
                 }
             }
@@ -584,7 +598,7 @@
         "users.UserResponse": {
             "type": "object",
             "properties": {
-                "deleted_at": {
+                "deletedAt": {
                     "description": "omitempty omits the field if it is nil",
                     "type": "string"
                 },

@@ -11,7 +11,7 @@ import (
 type AuthRepository interface {
 	Signup(ctx context.Context, req users.CreateUserRequest) (users.User, error)
 	Signin(ctx context.Context, req SigninRequest) (SigninResponse, error)
-	RefreshToken(ctx context.Context, req RefreshTokenRequest) (string, error)
+	RefreshToken(ctx context.Context, req RefreshTokenRequest) (string, string, error)
 	Logout(ctx context.Context, userID string) (bool, error)
 	GetByEmail(ctx context.Context, email string) (users.User, error)
 }
@@ -64,13 +64,13 @@ func (authRepo *authRepository) Signin(ctx context.Context, req SigninRequest) (
 	}, nil
 }
 
-func (authRepo *authRepository) RefreshToken(ctx context.Context, req RefreshTokenRequest) (string, error) {
-	accessToken, err := authRepo.refRepo.GenerateAcccessTokens(ctx, req.RefreshToken)
+func (authRepo *authRepository) RefreshToken(ctx context.Context, req RefreshTokenRequest) (string, string, error) {
+	accessToken, refreshToken, err := authRepo.refRepo.GenerateAcccessTokens(ctx, req.RefreshToken)
 	if err != nil {
-		return "", apperror.ErrUnauthorized.WithMessage("Token is invalid or expired.")
+		return "", "", apperror.ErrUnauthorized.WithMessage("Token is invalid or expired.")
 	}
 
-	return accessToken, nil
+	return accessToken, refreshToken, nil
 }
 
 func (authRepo *authRepository) Logout(ctx context.Context, userID string) (bool, error) {

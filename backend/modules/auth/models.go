@@ -4,9 +4,9 @@ import "time"
 
 type RefreshToken struct {
 	ID        string     `db:"id"`
-	UserID    string     `db:"user_id"`
-	TokenHash string     `db:"token_hash"`
-	CreatedAt time.Time  `db:"created_at"`
-	UpdatedAt time.Time  `db:"updated_at"`
-	DeletedAt *time.Time `db:"deleted_at"`
+	UserID    string     `db:"userId"`
+	TokenHash string     `db:"tokenHash"`
+	CreatedAt time.Time  `db:"createdAt"`
+	UpdatedAt time.Time  `db:"updatedAt"`
+	DeletedAt *time.Time `db:"deletedAt"`
 }

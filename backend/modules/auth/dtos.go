@@ -13,14 +13,14 @@ type SigninRequest struct {
 }
 
 type SignupResponse struct {
-	AccessToken  string     `json:"access_token"`
-	RefreshToken string     `json:"refresh_token"`
+	AccessToken  string     `json:"accessToken"`
+	RefreshToken string     `json:"refreshTtoken"`
 	User         users.User `json:"user"`
 }
 
 type SigninResponse struct {
-	AccessToken  string             `json:"access_token"`
-	RefreshToken string             `json:"refresh_token"`
+	AccessToken  string             `json:"accessToken"`
+	RefreshToken string             `json:"refreshToken"`
 	User         users.UserResponse `json:"user"`
 }
 

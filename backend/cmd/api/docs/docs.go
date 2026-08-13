@@ -242,7 +242,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "content": {
-                                            "type": "string"
+                                            "$ref": "#/definitions/dtos.Translation"
                                         }
                                     }
                                 }
@@ -409,10 +409,10 @@ const docTemplate = `{
         "auth.RefreshTokenRequest": {
             "type": "object",
             "required": [
-                "refresh_token"
+                "refreshToken"
             ],
             "properties": {
-                "refresh_token": {
+                "refreshToken": {
                     "type": "string"
                 }
             }
@@ -420,10 +420,10 @@ const docTemplate = `{
         "auth.RefreshTokenResponse": {
             "type": "object",
             "properties": {
-                "access_token": {
+                "accessToken": {
                     "type": "string"
                 },
-                "refresh_token": {
+                "refreshToken": {
                     "type": "string"
                 }
             }
@@ -458,10 +458,10 @@ const docTemplate = `{
         "auth.SigninResponse": {
             "type": "object",
             "properties": {
-                "access_token": {
+                "accessToken": {
                     "type": "string"
                 },
-                "refresh_token": {
+                "refreshToken": {
                     "type": "string"
                 },
                 "user": {
@@ -499,10 +499,10 @@ const docTemplate = `{
         "auth.SignupResponse": {
             "type": "object",
             "properties": {
-                "access_token": {
+                "accessToken": {
                     "type": "string"
                 },
-                "refresh_token": {
+                "refreshTtoken": {
                     "type": "string"
                 },
                 "user": {
@@ -529,6 +529,17 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "text": {
+                    "type": "string"
+                }
+            }
+        },
+        "dtos.Translation": {
+            "type": "object",
+            "properties": {
+                "detectedLanguageCode": {
+                    "type": "string"
+                },
+                "translatedText": {
                     "type": "string"
                 }
             }
@@ -594,7 +605,7 @@ const docTemplate = `{
         "users.UserResponse": {
             "type": "object",
             "properties": {
-                "deleted_at": {
+                "deletedAt": {
                     "description": "omitempty omits the field if it is nil",
                     "type": "string"
                 },

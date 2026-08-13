@@ -10,14 +10,16 @@ definitions:
     type: object
   auth.RefreshTokenRequest:
     properties:
-      refresh_token:
+      refreshToken:
         type: string
     required:
-    - refresh_token
+    - refreshToken
     type: object
   auth.RefreshTokenResponse:
     properties:
-      access_token:
+      accessToken:
+        type: string
+      refreshToken:
         type: string
     type: object
   auth.RefreshTokenSuccessWrapper:
@@ -40,9 +42,9 @@ definitions:
     type: object
   auth.SigninResponse:
     properties:
-      access_token:
+      accessToken:
         type: string
-      refresh_token:
+      refreshToken:
         type: string
       user:
         $ref: '#/definitions/users.UserResponse'
@@ -67,9 +69,9 @@ definitions:
     type: object
   auth.SignupResponse:
     properties:
-      access_token:
+      accessToken:
         type: string
-      refresh_token:
+      refreshTtoken:
         type: string
       user:
         $ref: '#/definitions/users.User'
@@ -87,6 +89,13 @@ definitions:
       target:
         type: string
       text:
+        type: string
+    type: object
+  dtos.Translation:
+    properties:
+      detectedLanguageCode:
+        type: string
+      translatedText:
         type: string
     type: object
   responsedto.ApplicationErrorResponse:
@@ -130,7 +139,7 @@ definitions:
     type: object
   users.UserResponse:
     properties:
-      deleted_at:
+      deletedAt:
         description: omitempty omits the field if it is nil
         type: string
       email:
@@ -338,7 +347,7 @@ paths:
             - $ref: '#/definitions/responsedto.ApplicationResponse'
             - properties:
                 content:
-                  type: string
+                  $ref: '#/definitions/dtos.Translation'
               type: object
         "400":
           description: Invalid JSON structure
