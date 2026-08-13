@@ -2,6 +2,7 @@
 
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { apiFetch } from "../api-server";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
 export type LoginState = {message: string}
@@ -39,26 +40,30 @@ export async function signin(
         return { message: "Sign in Failed."}
     }
 
-    const cookieStore = await cookies();
-    const secure = process.env.NODE_ENV === "production"
-
-    cookieStore.set("access_token", access_token, {
-        httpOnly: true,
-        secure,
-        sameSite: "lax",
-        path: "/",
-        maxAge: 7 * 24 * 60 * 60
-    })
-
-    cookieStore.set("refresh_token", refresh_token, {
-        httpOnly: true,
-        secure,
-        sameSite: "lax",
-        path: "/",
-        maxAge: 15 * 60
-    })
+    await cookieSetter(access_token, refresh_token)
 
     redirect("/");
+}
+
+export async function refreshAccessToken(){
+    const cookieStore = await cookies();
+    const currentRefreshToken = cookieStore.get("refresh_token")?.value;
+
+    const res = await apiFetch("api/auth/refresh", {
+        method: "POST",
+        headers: {"Content-Type": "application/json" },
+        body: JSON.stringify({refresh_token: currentRefreshToken}),
+        cache: "no-store"
+    })
+
+    const data = await res.json().catch(() => null)
+    if (!res.ok || typeof data !== 'object' || data === null) {
+        return { message: data?.message ?? "Refresh token failed." }
+    }
+
+    const {access_token, refresh_token} = data.content;
+
+    await cookieSetter(access_token, refresh_token);
 }
 
 export type SignUpState = {message: string}
@@ -91,8 +96,39 @@ export async function signup (
         return { message: body?.message ?? "Sign up failed." }
     }
 
-    redirect("/login");
+    const {access_token, refresh_token} = body?.content ?? {};
+    if (!access_token || !refresh_token) {
+        return { message: "Sign up Failed."}
+    }
+
+    await cookieSetter(access_token, refresh_token)
+
+    redirect("/");
 }
+
+export async function cookieSetter(
+    access_token: string,
+    refresh_token: string
+) {
+    const cookieStore = await cookies();
+    const secure = process.env.NODE_ENV === "production"
+
+    cookieStore.set("access_token", access_token, {
+        httpOnly: true,
+        secure,
+        sameSite: "lax",
+        path: "/",
+        maxAge: 15 * 60
+    })
+
+    cookieStore.set("refresh_token", refresh_token, {
+        httpOnly: true,
+        secure,
+        sameSite: "lax",
+        path: "/",
+        maxAge: 7 * 24 * 60 * 60
+    })
+} 
 
 export async function logout() {
     const cookieStore = await cookies();

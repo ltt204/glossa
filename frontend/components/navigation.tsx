@@ -8,13 +8,12 @@ import { logout } from '@/lib/auth/action'
 import { Button } from './ui/button'
 
 const LINKS = [
-	{ href: '/', label: 'Translator', icon: Languages },
+	{ href: '/translate', label: 'Translator', icon: Languages },
 	{ href: '/words', label: 'Words', icon: BookMarked },
 ] as const
 
 export function Navigation() {
 	const pathname = usePathname()
-	// const [state, formAction, pending] = useActionState(logout)
 
 	return (
 		<nav className="fixed top-4 left-1/2 -translate-x-1/2 z-50">
@@ -42,7 +41,7 @@ export function Navigation() {
 					<Button
 						type="submit"
 						aria-label="Sign out"
-						className="flex items-center rounded-full px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
+						className="flex items-center rounded-full px-3 py-1.5 text-xs font-medium transition-colors hover:bg-muted/60 hover:text-foreground cursor-pointer"
 					>
 						<LogOut className="w-3.5 h-3.5" />
 					</Button>

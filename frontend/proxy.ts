@@ -1,18 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export default function proxy(request: NextRequest) {
-    const hasSession = request.cookies.has("access_token")
-    const isLoginpage = request.nextUrl.pathname === "/login"
+const PUBLIC = ["/login", "/signup"];
 
-    if (!isLoginpage && !hasSession) {
+export default function proxy(request: NextRequest) {
+    const hasSession = request.cookies.has("refresh_token") && request.cookies.get("refresh_token")?.value !== ""
+    const isPublicPage = PUBLIC.includes(request.nextUrl.pathname)
+
+    if (!isPublicPage && !hasSession) {
         const url = request.nextUrl.clone()
         url.pathname="/login"
         return NextResponse.redirect(url)
     } 
 
-    if (isLoginpage && hasSession) {
+    if (isPublicPage && hasSession) {
         const url = request.nextUrl.clone()
-        url.pathname="/"
+        url.pathname="/words"
         return NextResponse.redirect(url)
     } 
 
@@ -20,5 +22,5 @@ export default function proxy(request: NextRequest) {
 }
 
 export const config= {
-    matcher: ["/", "/words/:path", "/login"]
+    matcher: ["/","/translate", "/words", "/words/:path", "/login", "/signup"]
 }

@@ -6,6 +6,7 @@ import { Label } from '../ui/label'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 import { Separator } from '../ui/separator'
+import Link from 'next/link'
 
 const initialState: SignUpState = { message: '' }
 
@@ -33,7 +34,7 @@ export default function SignUpForm() {
 				<Input type="password" id="password" name="password" required />
 			</div>
 			{state.message && (
-				<p aria-live="polite" className="w-full">
+				<p aria-live="polite" className="w-full text-destructive">
 					{state.message}
 				</p>
 			)}
@@ -44,10 +45,7 @@ export default function SignUpForm() {
 			<Separator />
 			<div className="space-y-2">
 				<span>
-					Already have an account?{' '}
-					<a className="text-primary link" href="/login">
-						Log in
-					</a>
+					Already have an account? <Link href="/login">Log in</Link>
 				</span>
 			</div>
 		</form>

@@ -5,7 +5,6 @@ import { useActionState } from 'react'
 import { Label } from '../ui/label'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
-import { Link } from 'lucide-react'
 import { Separator } from '../ui/separator'
 
 const initialState: LoginState = { message: '' }
@@ -17,7 +16,7 @@ export function LoginForm() {
 		<div className="grid gap-2">
 			<form action={formAction} className="space-y-4">
 				<div className="space-y-2">
-					<Label htmlFor="password">Email</Label>
+					<Label htmlFor="email">Email</Label>
 					<Input
 						id="email"
 						name="email"
@@ -40,7 +39,7 @@ export function LoginForm() {
 				</div>
 
 				{state.message && (
-					<p aria-live="polite" className="w-full">
+					<p aria-live="polite" className="w-full text-destructive">
 						{state.message}
 					</p>
 				)}
