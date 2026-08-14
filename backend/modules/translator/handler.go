@@ -6,6 +6,7 @@ import (
 	"glossa/modules/definition"
 	"glossa/modules/translator/dtos"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -103,6 +104,8 @@ func (h *TranslationHandler) handleTranslateMock(ctx *gin.Context) {
 			},
 		},
 	})
+
+	time.Sleep(2 * time.Second)
 
 	ctx.JSON(http.StatusOK, appRes)
 }

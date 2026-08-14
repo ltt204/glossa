@@ -24,8 +24,10 @@ import {
 	Languages,
 } from 'lucide-react'
 import Link from 'next/link'
-import { translate } from '@/lib/translate/actions'
 import * as models from '@/lib/translate/models'
+import useDebounce from '@/app/(app)/translate/hooks/useDebounce'
+import TypingIndicator from './shared/typing-indicator'
+import { translate } from '@/lib/translate/actions'
 
 const LANGUAGES = [
 	{ code: 'en', name: 'English', flag: 'EN' },
@@ -52,13 +54,33 @@ export function Translator() {
 	const [isTranslating, setIsTranslating] = useState(false)
 	const [copied, setCopied] = useState(false)
 	const [detectedLang, setDetectedLang] = useState<string | null>(null)
-	const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+	const debouncedSourceText = useDebounce(sourceText)
 
 	useEffect(() => {
-		if (sourceText.trim() === '') return
+		if (debouncedSourceText.trim() === '') return
+
+		const controller = new AbortController()
+		const { signal } = controller
 		const fetchData = async () => {
 			setIsTranslating(true)
-			const data = await translate(sourceText, targetLang)
+			const response = await fetch('/api/translate', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ text: debouncedSourceText, target: targetLang }),
+				signal,
+			})
+
+			if (!response.ok) {
+				throw new Error('Translation failed')
+			}
+
+			const res = await response.json()
+			if (!res.success || !res.content) {
+				throw new Error(res.message || 'Translation failed')
+			}
+
+			const data: models.TranslateResult = res.content
+
 			setTranslatedText(
 				data.translations
 					.map((translation: models.Translate) => {
@@ -67,24 +89,34 @@ export function Translator() {
 					.join(', '),
 			)
 
-			if (data.definitions.length === 1) {
+			if (data.definitions && data.definitions.length > 0) {
 				const phonetics = data.definitions[0].phonetics.filter(
 					(phonetic) => phonetic.text !== '',
 				)
-				setPhonetic(phonetics[0].text)
+				setPhonetic(phonetics[0]?.text || '')
 				setWordMeanings(data.definitions[0].meanings)
 			} else {
 				setPhonetic('')
 				setWordMeanings([])
 			}
 
-			setDetectedLang(
-				(data.translations[0] as models.Translate).detectedLanguageCode || '',
-			)
+			if (data.translations && data.translations.length > 0) {
+				setDetectedLang(data.translations[0].detectedLanguageCode || '')
+			}
 			setIsTranslating(false)
 		}
-		fetchData()
-	}, [targetLang, sourceText])
+		fetchData().catch((err) => {
+			if (err.name !== 'AbortError') {
+				console.error(err)
+			} else {
+				console.log('Fetching aborted')
+			}
+		})
+
+		return () => {
+			controller.abort()
+		}
+	}, [targetLang, debouncedSourceText])
 
 	const setEmpty = () => {
 		setPhonetic('')
@@ -93,19 +125,13 @@ export function Translator() {
 		setWordMeanings([])
 	}
 
-	const handleInputChange = (value: string) => {
-		setSourceText(value)
-		if (debounceRef.current) clearTimeout(debounceRef.current)
-		debounceRef.current = setTimeout(() => {
-			translate(value, targetLang)
-		}, 500)
-	}
-
+	// TODO: Handle Abort Signal for changing target language
 	const handleTargetChange = (lang: string) => {
 		setTargetLang(lang)
 		if (sourceText.trim()) translate(sourceText, lang)
 	}
 
+	// TODO: Handle Abort Signal for swapping languages
 	const handleSwap = () => {
 		if (sourceLang === 'auto' || !translatedText) return
 		const prevSource = sourceLang
@@ -218,16 +244,13 @@ export function Translator() {
 				</Select>
 			</div>
 
-			{/* Divider */}
-			<div className="mx-5 h-px bg-border/60" />
-
 			<div className="flex-1 flex flex-col md:flex-row gap-4">
 				{/* Source input */}
-				<div className="flex-1 flex flex-col px-5 pt-2 pb-2 min-h-0 gap-4">
+				<div className="flex-1 flex flex-col px-5 pt-2 pb-2 min-h-0 gap-2 border-2 border-solid mx-8 rounded-md">
 					<div className="relative flex-1">
 						<Textarea
 							value={sourceText}
-							onChange={(e) => handleInputChange(e.target.value)}
+							onChange={(e) => setSourceText(e.target.value)}
 							placeholder="Type or paste text..."
 							className="min-h-8 rounded-none resize-none border-none bg-transparent px-0 py-0 focus:outline-none text-[15px] leading-relaxed placeholder:text-muted-foreground/50 focus-visible:ring-0 focus-visible:border-transparent"
 						/>
@@ -338,20 +361,16 @@ export function Translator() {
 				</div> */}
 
 				{/* Translation output */}
-				<div className="flex-1 flex flex-col px-5 pt-3 pb-2 min-h-0">
+				<div className="flex-1 flex flex-col px-5 pt-3 pb-2 min-h-0 rounded-md border-2 border-solid mx-8">
 					<div className="flex-1">
 						{sourceText.trim() !== '' && isTranslating ? (
-							<div className="flex items-center gap-1.5 pt-2">
-								<span className="w-1.5 h-1.5 rounded-full bg-primary pulse-dot" />
-								<span className="w-1.5 h-1.5 rounded-full bg-primary pulse-dot" />
-								<span className="w-1.5 h-1.5 rounded-full bg-primary pulse-dot" />
-							</div>
+							<TypingIndicator />
 						) : sourceText.trim() !== '' && translatedText ? (
-							<p className="text-[15px] leading-relaxed text-foreground/90 whitespace-pre-wrap">
+							<p className="leading-relaxed text-foreground/90 whitespace-pre-wrap">
 								{translatedText}
 							</p>
 						) : (
-							<p className="text-[15px] leading-relaxed text-muted-foreground/40 italic">
+							<p className="leading-relaxed text-muted-foreground/40 italic">
 								Translation will appear here...
 							</p>
 						)}
