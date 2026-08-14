@@ -48,7 +48,7 @@ func (us *AuthService) Signup(ctx context.Context, req SignupRequest) (SignupRes
 	return SignupResponse{
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
-		User:         user,
+		User:         user.ToDto(),
 	}, nil
 }
 

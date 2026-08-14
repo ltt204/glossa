@@ -1,9 +1,9 @@
 package users
 
-func ToDto(user User) UserResponse {
+func (u *User) ToDto() UserResponse {
 	return UserResponse{
-		ID:        user.ID,
-		Email:     user.Email,
-		DeletedAt: user.DeletedAt,
+		ID:        u.ID,
+		Email:     u.Email,
+		DeletedAt: u.DeletedAt,
 	}
 }

@@ -60,7 +60,7 @@ func (authRepo *authRepository) Signin(ctx context.Context, req SigninRequest) (
 	return SigninResponse{
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
-		User:         users.ToDto(user),
+		User:         user.ToDto(),
 	}, nil
 }
 

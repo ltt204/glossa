@@ -74,7 +74,7 @@ definitions:
       refreshTtoken:
         type: string
       user:
-        $ref: '#/definitions/users.User'
+        $ref: '#/definitions/users.UserResponse'
     type: object
   auth.SignupSuccessWrapper:
     properties:
@@ -117,24 +117,6 @@ definitions:
       success:
         type: boolean
       timestamp:
-        type: string
-    type: object
-  users.User:
-    properties:
-      createdAt:
-        type: string
-      deletedAt:
-        type: string
-      email:
-        description: NOT NULL UNIQUE
-        type: string
-      id:
-        description: UUID
-        type: string
-      password:
-        description: NOT NULL
-        type: string
-      updatedAt:
         type: string
     type: object
   users.UserResponse:

@@ -506,7 +506,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "user": {
-                    "$ref": "#/definitions/users.User"
+                    "$ref": "#/definitions/users.UserResponse"
                 }
             }
         },
@@ -572,32 +572,6 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "timestamp": {
-                    "type": "string"
-                }
-            }
-        },
-        "users.User": {
-            "type": "object",
-            "properties": {
-                "createdAt": {
-                    "type": "string"
-                },
-                "deletedAt": {
-                    "type": "string"
-                },
-                "email": {
-                    "description": "NOT NULL UNIQUE",
-                    "type": "string"
-                },
-                "id": {
-                    "description": "UUID",
-                    "type": "string"
-                },
-                "password": {
-                    "description": "NOT NULL",
-                    "type": "string"
-                },
-                "updatedAt": {
                     "type": "string"
                 }
             }

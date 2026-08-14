@@ -24,7 +24,7 @@ func NewHandler(svc *TranslationService) *TranslationHandler {
 // @Accept       json
 // @Produce      json
 // @Param        translateRequest body dtos.TranslateRequest true "Translation request body"
-// @Success      200  {object} responsedto.ApplicationResponse{content=dtos.TranslateResponse} "Translate success"
+// @Success      200  {object} responsedto.ApplicationResponse{content=dtos.Translation} "Translate success"
 // @Failure      400  {object} responsedto.ApplicationErrorResponse "Invalid JSON structure"
 // @Failure      500  {object} responsedto.ApplicationErrorResponse "Failed to translate word"
 // @Security     BearerAuth
