@@ -6,6 +6,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"glossa/internal/apperror"
+	"log"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -97,6 +98,7 @@ func (refRepo *tokenRepository) GenerateAcccessTokens(ctx context.Context, refre
 	var refreshTokenDO RefreshToken
 	row := refRepo.pool.QueryRow(ctx, "SELECT * FROM refresh_token WHERE token_hash = $1", hashedRefreshToken)
 	if err := row.Scan(&refreshTokenDO.ID, &refreshTokenDO.UserID, &refreshTokenDO.TokenHash, &refreshTokenDO.CreatedAt, &refreshTokenDO.UpdatedAt, &refreshTokenDO.DeletedAt); err != nil {
+		log.Fatal("Error: ", err)
 		return "", "", apperror.InternalServerError.WithMessage("Something went wrong")
 	}
 

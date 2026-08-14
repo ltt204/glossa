@@ -16,16 +16,16 @@ func NewWordDefinitionService(dictApi string) *WordDefinitionService {
 	return &WordDefinitionService{DictApi: dictApi}
 }
 
-func (svc *WordDefinitionService) GetWordDefinition(ctx context.Context, word string) (WordDefinitions, error) {
+func (svc *WordDefinitionService) GetWordDefinition(ctx context.Context, word string) ([]WordDefinitions, error) {
 	dictUrl := svc.DictApi + word
-	result := WordDefinitions{}
+	result := []WordDefinitions{}
 	response, err := http.Get(dictUrl)
 	if err != nil {
 		return result, err
 	}
 	defer response.Body.Close()
 
-	if response.StatusCode != http.StatusNotFound {
+	if response.StatusCode == http.StatusNotFound {
 		return result, nil
 	}
 
@@ -43,7 +43,5 @@ func (svc *WordDefinitionService) GetWordDefinition(ctx context.Context, word st
 		return result, err
 	}
 
-	return WordDefinitions{
-		Entries: parsedResult,
-	}, nil
+	return parsedResult, nil
 }

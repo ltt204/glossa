@@ -1,12 +1,7 @@
 package definition
 
 type WordDefinitions struct {
-	Entries []DictionaryEntry `json:"entries"`
-}
-
-type DictionaryEntry struct {
 	Word      string     `json:"word"`
-	Phonetic  string     `json:"phonetic"`
 	Phonetics []Phonetic `json:"phonetics"`
 	Origin    string     `json:"origin"`
 	Meanings  []Meaning  `json:"meanings"`

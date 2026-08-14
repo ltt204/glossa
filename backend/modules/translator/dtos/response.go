@@ -5,8 +5,8 @@ import (
 )
 
 type WordResult struct {
-	Translations []Translation              `json:"translations"`
-	Definitions  definition.WordDefinitions `json:"definitions"`
+	Translations []Translation                `json:"translations"`
+	Definitions  []definition.WordDefinitions `json:"definitions"`
 }
 
 type Translation struct {
