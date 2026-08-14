@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/tooltip'
 import { BookMarked, Plus, Trash2, Volume2 } from 'lucide-react'
 import { WordsApiError, CreateWordInput, Word } from '@/lib/words/models'
-import { createWord, deleteWord, getWords } from '@/lib/words/action'
+import { createWord, deleteWord, getWords } from '@/lib/words/actions'
 import { Card } from '@/components/ui/card'
 
 const LANGUAGES = [

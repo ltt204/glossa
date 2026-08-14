@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Languages, BookMarked, Settings, LogOut } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { logout } from '@/lib/auth/action'
+import { logout } from '@/lib/auth/actions'
 import { Button } from './ui/button'
 
 const LINKS = [

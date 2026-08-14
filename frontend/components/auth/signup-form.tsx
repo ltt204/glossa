@@ -1,6 +1,6 @@
 'use client'
 
-import { SignUpState, signup } from '@/lib/auth/action'
+import { SignUpState, signup } from '@/lib/auth/actions'
 import { useActionState } from 'react'
 import { Label } from '../ui/label'
 import { Input } from '../ui/input'

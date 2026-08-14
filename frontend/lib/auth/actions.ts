@@ -3,7 +3,7 @@
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { apiFetch } from '../api-server'
-import { SignInResponse } from './models'
+import { SignInResponse, SignUpResponse } from './models'
 
 export type LoginState = {
 	isSuccess: boolean
@@ -62,23 +62,20 @@ export async function signup(
 		return { message: 'All fields are required' }
 	}
 
-	const res = await fetch(`/api/auth/signup`, {
+	const res = await apiFetch<SignUpResponse>(`api/auth/signup`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({ email, password }),
 		cache: 'no-store',
-	}).catch(() => null)
+	})
 
-	if (!res) {
-		return { message: 'Could not reach the server.' }
+	console.log('Signup Response: ', res)
+
+	if (res.status !== 200 || !res.content) {
+		return { message: res.message ?? 'Sign up failed.' }
 	}
 
-	const body = await res.json().catch(() => null)
-	if (!res.ok || typeof body !== 'object' || body === null) {
-		return { message: body?.message ?? 'Sign up failed.' }
-	}
-
-	const { accessToken, refreshToken } = body?.content ?? {}
+	const { accessToken, refreshToken } = res.content
 	if (!accessToken || !refreshToken) {
 		return { message: 'Sign up Failed.' }
 	}
@@ -113,7 +110,7 @@ async function setCredentialsCookie(accessToken: string, refreshToken: string) {
 
 export async function logout() {
 	const cookieStore = await cookies()
-	const accessToken = cookieStore.get('accessToken')?.value
+	const accessToken = cookieStore.get('access_token')?.value
 
 	if (accessToken) {
 		await fetch(`/api/auth/logout`, {
@@ -125,8 +122,8 @@ export async function logout() {
 		}).catch(() => null)
 	}
 
-	cookieStore.delete('accessToken')
-	cookieStore.delete('refreshToken')
+	cookieStore.delete('access_token')
+	cookieStore.delete('refresh_token')
 
 	redirect('/login')
 }

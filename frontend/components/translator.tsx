@@ -45,6 +45,7 @@ const LANGUAGES = [
 
 export function Translator() {
 	const [sourceText, setSourceText] = useState('')
+	const [phonetic, setPhonetic] = useState('')
 	const [translatedText, setTranslatedText] = useState('')
 	const [sourceLang, setSourceLang] = useState('auto')
 	const [targetLang, setTargetLang] = useState('vi')
@@ -66,6 +67,16 @@ export function Translator() {
 					})
 					.join(', '),
 			)
+
+			if (data.definitions.length === 1) {
+				const phonetics = data.definitions[0].phonetics.filter(
+					(phonetic) => phonetic.text !== '',
+				)
+				setPhonetic(phonetics[0].text)
+			} else {
+				setPhonetic('')
+			}
+
 			setDetectedLang(
 				(data.translations[0] as models.Translate).detectedLanguageCode || '',
 			)
@@ -204,7 +215,7 @@ export function Translator() {
 			<div className="mx-5 h-px bg-border/60" />
 
 			{/* Source input */}
-			<div className="flex-1 flex flex-col px-5 pt-4 pb-2 min-h-0">
+			<div className="flex-1 flex flex-col px-5 pt-4 pb-2 min-h-0 gap-4">
 				<div className="relative flex-1">
 					<Textarea
 						value={sourceText}
@@ -212,6 +223,9 @@ export function Translator() {
 						placeholder="Type or paste text..."
 						className="h-full min-h-[120px] resize-none border-none bg-transparent px-0 py-0 text-[15px] leading-relaxed placeholder:text-muted-foreground/50 focus-visible:ring-0 focus-visible:border-transparent"
 					/>
+					<p className="text-sm leading-relaxed text-muted-foreground whitespace-pre-wrap">
+						{phonetic}
+					</p>
 				</div>
 				<div className="flex items-center justify-between pt-1">
 					<div className="flex items-center gap-1">

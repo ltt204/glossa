@@ -54,7 +54,7 @@ async function refreshAccessToken(): Promise<RefreshTokenResponse | null> {
 				'Content-Type': 'application/json',
 			},
 			body: JSON.stringify({
-				refresh_token: currentRefreshToken,
+				refreshToken: currentRefreshToken,
 			}),
 		})
 
@@ -79,10 +79,15 @@ async function handleServerResponse<T>(
 	response: Response,
 ): Promise<ServerResponse<T>> {
 	if (!response.ok) {
+		const data = await response
+			.json()
+			.then((res: ServerResponse<T>) => ({ ...res, status: response.status }))
+			.catch(() => null)
+
 		return {
 			success: false,
 			status: response.status,
-			message: 'Failed to fetch data.',
+			message: data?.message ?? 'Failed to fetch data.',
 			content: undefined,
 		}
 	}

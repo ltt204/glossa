@@ -1,41 +1,38 @@
 export type TranslateRequest = {
-    text: string;
-    target: string;
+	text: string
+	target: string
 }
-
 
 export type TranslateResult = {
-    translations: Translate[];
-    definitions: WordDefinitions;
+	translations: Translate[]
+	definitions: DictionaryEntry[]
 }
 
-export type WordDefinitions = {
-	Entries: DictionaryEntry[] }
-
 export type DictionaryEntry = {
-	Word:      string;     
-    Phonetic:  string;     
-    Phonetics: Phonetic[]; 
-    Origin:    string;     
-    Meanings:  Meaning[];  }
+	word: string
+	phonetics: Phonetic[]
+	origin: string
+	meanings: Meaning[]
+}
 
 export type Phonetic = {
-	Text:  string; 
-    Audio: string; }
+	text: string
+	audio: string
+}
 
 export type Meaning = {
-	PartOfSpeech: string;       
-    Definitions:  Definition[]; }
+	partOfSpeech: string
+	definitions: Definition[]
+}
 
 export type Definition = {
-	Definition: string;   
-    Example:    string;   
-	Synonyms:   string[]; 
-	Antonyms:   string[]; 
+	definition: string
+	example: string
+	synonyms: string[]
+	antonyms: string[]
 }
 
 export type Translate = {
-    translatedText: string; 
-    detectedLanguageCode: string;
+	translatedText: string
+	detectedLanguageCode: string
 }
-
