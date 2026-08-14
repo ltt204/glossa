@@ -36,6 +36,7 @@ func (refRepo *tokenRepository) Save(ctx context.Context, req CreateRefreshToken
 	var refreshToken RefreshToken
 	row := refRepo.pool.QueryRow(ctx, "INSERT INTO refresh_token (user_id, token_hash) VALUES ($1, $2) RETURNING id, user_id, token_hash, created_at, updated_at, deleted_at", req.UserId, req.TokenHash)
 	if err := row.Scan(&refreshToken.ID, &refreshToken.UserID, &refreshToken.TokenHash, &refreshToken.CreatedAt, &refreshToken.UpdatedAt, &refreshToken.DeletedAt); err != nil {
+		log.Println("Error[token_repository.save]: ", err)
 		return RefreshToken{}, err
 	}
 
@@ -76,7 +77,6 @@ func (refRepo *tokenRepository) GenerateTokens(ctx context.Context, userID strin
 	hash := sha256.Sum256([]byte(rawRefToken))
 	refreshToken := hex.EncodeToString(hash[:])
 
-	// Save token to database
 	_, err = refRepo.Save(ctx, CreateRefreshTokenRequest{
 		UserId:    userID,
 		TokenHash: refreshToken,
@@ -98,16 +98,16 @@ func (refRepo *tokenRepository) GenerateAcccessTokens(ctx context.Context, refre
 	var refreshTokenDO RefreshToken
 	row := refRepo.pool.QueryRow(ctx, "SELECT * FROM refresh_token WHERE token_hash = $1", hashedRefreshToken)
 	if err := row.Scan(&refreshTokenDO.ID, &refreshTokenDO.UserID, &refreshTokenDO.TokenHash, &refreshTokenDO.CreatedAt, &refreshTokenDO.UpdatedAt, &refreshTokenDO.DeletedAt); err != nil {
-		log.Fatal("Error: ", err)
+		log.Println("Error: ", err)
 		return "", "", apperror.InternalServerError.WithMessage("Something went wrong")
 	}
 
+	refRepo.RemoveAllByUserId(ctx, refreshTokenDO.UserID)
 	accessToken, refreshToken, err := refRepo.GenerateTokens(ctx, refreshTokenDO.UserID)
 
 	if err != nil {
 		return "", "", err
 	}
 
-	refRepo.RemoveAllByUserId(ctx, refreshTokenDO.UserID)
 	return accessToken, refreshToken, nil
 }
