@@ -71,7 +71,7 @@ definitions:
     properties:
       accessToken:
         type: string
-      refreshTtoken:
+      refreshToken:
         type: string
       user:
         $ref: '#/definitions/users.UserResponse'

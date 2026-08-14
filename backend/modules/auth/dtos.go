@@ -14,7 +14,7 @@ type SigninRequest struct {
 
 type SignupResponse struct {
 	AccessToken  string             `json:"accessToken"`
-	RefreshToken string             `json:"refreshTtoken"`
+	RefreshToken string             `json:"refreshToken"`
 	User         users.UserResponse `json:"user"`
 }
 

@@ -502,7 +502,7 @@ const docTemplate = `{
                 "accessToken": {
                     "type": "string"
                 },
-                "refreshTtoken": {
+                "refreshToken": {
                     "type": "string"
                 },
                 "user": {
