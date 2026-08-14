@@ -3,6 +3,7 @@ package translator
 import (
 	"glossa/internal/apperror"
 	"glossa/internal/responsedto"
+	"glossa/modules/definition"
 	"glossa/modules/translator/dtos"
 	"net/http"
 
@@ -47,6 +48,61 @@ func (h *TranslationHandler) handleTranslate(ctx *gin.Context) {
 	}
 
 	appRes := responsedto.SuccessResponse("Translate success", result)
+
+	ctx.JSON(http.StatusOK, appRes)
+}
+
+func (h *TranslationHandler) handleTranslateMock(ctx *gin.Context) {
+	appRes := responsedto.SuccessResponse("Translate success", dtos.WordResult{
+		Translations: []dtos.Translation{
+			{
+				TranslatedText:       "Mock Translation Response",
+				DetectedLanguageCode: "en",
+			},
+		},
+		Definitions: []definition.WordDefinitions{
+			{
+				Word: "Mock Definition",
+				Phonetics: []definition.Phonetic{
+					{
+						Text: "/mock/phonetic/",
+					},
+				},
+				Meanings: []definition.Meaning{
+					{
+						PartOfSpeech: "mock",
+						Definitions: []definition.Definition{
+							{
+								Definition: "Mock definition",
+								Example:    "Mock example",
+								Synonyms:   []string{"mock", "synonym"},
+							},
+						},
+					},
+					{
+						PartOfSpeech: "mock",
+						Definitions: []definition.Definition{
+							{
+								Definition: "Mock definition",
+								Example:    "Mock example",
+								Synonyms:   []string{"mock", "synonym"},
+							},
+						},
+					},
+					{
+						PartOfSpeech: "mock",
+						Definitions: []definition.Definition{
+							{
+								Definition: "Mock definition",
+								Example:    "Mock example",
+								Synonyms:   []string{"mock", "synonym"},
+							},
+						},
+					},
+				},
+			},
+		},
+	})
 
 	ctx.JSON(http.StatusOK, appRes)
 }
