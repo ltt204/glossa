@@ -33,7 +33,6 @@ export async function signin(
 		}),
 		cache: 'no-store',
 	})
-	console.log('Signin Response: ', res)
 	if (res.status !== 200 || !res.content) {
 		return { isSuccess: res.success, message: res.message ?? 'Sign in failed.' }
 	}

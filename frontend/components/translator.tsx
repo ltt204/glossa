@@ -22,9 +22,8 @@ import {
 	Volume2,
 	Eraser,
 	Languages,
-	Sun,
-	Moon,
 } from 'lucide-react'
+import Link from 'next/link'
 import { translate } from '@/lib/translate/actions'
 import * as models from '@/lib/translate/models'
 
@@ -49,6 +48,7 @@ export function Translator() {
 	const [translatedText, setTranslatedText] = useState('')
 	const [sourceLang, setSourceLang] = useState('auto')
 	const [targetLang, setTargetLang] = useState('vi')
+	const [wordMeanings, setWordMeanings] = useState<models.Meaning[]>([])
 	const [isTranslating, setIsTranslating] = useState(false)
 	const [copied, setCopied] = useState(false)
 	const [detectedLang, setDetectedLang] = useState<string | null>(null)
@@ -62,7 +62,6 @@ export function Translator() {
 			setTranslatedText(
 				data.translations
 					.map((translation: models.Translate) => {
-						console.log('Translation: ', translation.translatedText)
 						return translation.translatedText
 					})
 					.join(', '),
@@ -73,8 +72,10 @@ export function Translator() {
 					(phonetic) => phonetic.text !== '',
 				)
 				setPhonetic(phonetics[0].text)
+				setWordMeanings(data.definitions[0].meanings)
 			} else {
 				setPhonetic('')
+				setWordMeanings([])
 			}
 
 			setDetectedLang(
@@ -84,6 +85,13 @@ export function Translator() {
 		}
 		fetchData()
 	}, [targetLang, sourceText])
+
+	const setEmpty = () => {
+		setPhonetic('')
+		setTranslatedText('')
+		setDetectedLang(null)
+		setWordMeanings([])
+	}
 
 	const handleInputChange = (value: string) => {
 		setSourceText(value)
@@ -107,7 +115,7 @@ export function Translator() {
 		setSourceLang(prevTarget)
 		setTargetLang(prevSource)
 		setSourceText(prevTranslated)
-		setTranslatedText('')
+		setEmpty()
 		translate(prevTranslated, prevSource)
 	}
 
@@ -129,8 +137,7 @@ export function Translator() {
 
 	const handleClear = () => {
 		setSourceText('')
-		setTranslatedText('')
-		setDetectedLang(null)
+		setEmpty()
 	}
 
 	const charCount = sourceText.length
@@ -214,34 +221,150 @@ export function Translator() {
 			{/* Divider */}
 			<div className="mx-5 h-px bg-border/60" />
 
-			{/* Source input */}
-			<div className="flex-1 flex flex-col px-5 pt-4 pb-2 min-h-0 gap-4">
-				<div className="relative flex-1">
-					<Textarea
-						value={sourceText}
-						onChange={(e) => handleInputChange(e.target.value)}
-						placeholder="Type or paste text..."
-						className="h-full min-h-[120px] resize-none border-none bg-transparent px-0 py-0 text-[15px] leading-relaxed placeholder:text-muted-foreground/50 focus-visible:ring-0 focus-visible:border-transparent"
-					/>
-					<p className="text-sm leading-relaxed text-muted-foreground whitespace-pre-wrap">
-						{phonetic}
-					</p>
+			<div className="flex-1 flex flex-col md:flex-row gap-4">
+				{/* Source input */}
+				<div className="flex-1 flex flex-col px-5 pt-2 pb-2 min-h-0 gap-4">
+					<div className="relative flex-1">
+						<Textarea
+							value={sourceText}
+							onChange={(e) => handleInputChange(e.target.value)}
+							placeholder="Type or paste text..."
+							className="min-h-8 rounded-none resize-none border-none bg-transparent px-0 py-0 focus:outline-none text-[15px] leading-relaxed placeholder:text-muted-foreground/50 focus-visible:ring-0 focus-visible:border-transparent"
+						/>
+						{sourceText.trim() !== '' && phonetic && (
+							<p className="text-sm leading-relaxed text-muted-foreground whitespace-pre-wrap">
+								{phonetic}
+							</p>
+						)}
+
+						{sourceText.trim() !== '' && wordMeanings.length === 1 ? (
+							<div className="flex flex-row gap-2">
+								{wordMeanings.map((meaning) => (
+									<div
+										key={meaning.partOfSpeech}
+										className="flex items-center gap-2"
+									>
+										<p className="text-sm leading-relaxed text-muted-foreground">
+											{meaning.partOfSpeech}
+										</p>
+									</div>
+								))}
+								<a
+									// TODO: Handle open side panel and show definitions
+									onClick={() => console.log('Show side panel')}
+									className="text-sm leading-relaxed text-primary"
+								>
+									See word's definitions
+								</a>
+							</div>
+						) : sourceText.trim() !== '' && wordMeanings.length > 1 ? (
+							<div className="flex flex-row gap-2">
+								<div className="flex items-center gap-2">
+									<p className="text-sm leading-relaxed text-muted-foreground">
+										{wordMeanings[0].partOfSpeech} + {wordMeanings.length - 1}{' '}
+										more
+									</p>
+								</div>
+								<a
+									// TODO: Handle open side panel and show definitions
+									onClick={() => console.log('Show side panel')}
+									className="text-sm leading-relaxed text-primary font-medium text-fg-brand hover:underline cursor-pointer"
+								>
+									See word's definitions
+								</a>
+							</div>
+						) : (
+							sourceText.trim() !== '' &&
+							wordMeanings.length === 0 && (
+								<p className="text-sm leading-relaxed text-muted-foreground">
+									No definition found
+								</p>
+							)
+						)}
+					</div>
+					<div className="flex flex-1 items-center justify-between pt-1">
+						<div className="flex items-center gap-1">
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<Button
+										variant="ghost"
+										size="icon-xs"
+										onClick={() =>
+											handleSpeak(
+												sourceText,
+												sourceLang === 'auto'
+													? detectedLang || 'en'
+													: sourceLang,
+											)
+										}
+										disabled={!sourceText}
+										className="text-muted-foreground hover:text-primary hover:bg-primary/10"
+									>
+										<Volume2 className="w-3.5 h-3.5" />
+									</Button>
+								</TooltipTrigger>
+								<TooltipContent>Listen</TooltipContent>
+							</Tooltip>
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<Button
+										variant="ghost"
+										size="icon-xs"
+										onClick={handleClear}
+										disabled={!sourceText}
+										className=" text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+									>
+										<Eraser className="w-3.5 h-3.5" />
+									</Button>
+								</TooltipTrigger>
+								<TooltipContent>Clear</TooltipContent>
+							</Tooltip>
+						</div>
+						<span className="text-[10px] tabular-nums text-muted-foreground/60">
+							{charCount > 0 && `${charCount}`}
+						</span>
+					</div>
 				</div>
-				<div className="flex items-center justify-between pt-1">
-					<div className="flex items-center gap-1">
+
+				{/* Result divider */}
+				{/* <div className="mx-5 flex items-center gap-3">
+					<div className="flex-1 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+					<div
+						className={`w-1.5 h-1.5 rounded-full transition-colors duration-300 ${
+							isTranslating ? 'bg-primary animate-pulse' : 'bg-border'
+						}`}
+					/>
+					<div className="flex-1 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+				</div> */}
+
+				{/* Translation output */}
+				<div className="flex-1 flex flex-col px-5 pt-3 pb-2 min-h-0">
+					<div className="flex-1">
+						{sourceText.trim() !== '' && isTranslating ? (
+							<div className="flex items-center gap-1.5 pt-2">
+								<span className="w-1.5 h-1.5 rounded-full bg-primary pulse-dot" />
+								<span className="w-1.5 h-1.5 rounded-full bg-primary pulse-dot" />
+								<span className="w-1.5 h-1.5 rounded-full bg-primary pulse-dot" />
+							</div>
+						) : sourceText.trim() !== '' && translatedText ? (
+							<p className="text-[15px] leading-relaxed text-foreground/90 whitespace-pre-wrap">
+								{translatedText}
+							</p>
+						) : (
+							<p className="text-[15px] leading-relaxed text-muted-foreground/40 italic">
+								Translation will appear here...
+							</p>
+						)}
+					</div>
+					<div className="flex items-center gap-1 pt-1">
 						<Tooltip>
 							<TooltipTrigger asChild>
 								<Button
 									variant="ghost"
 									size="icon-xs"
-									onClick={() =>
-										handleSpeak(
-											sourceText,
-											sourceLang === 'auto' ? detectedLang || 'en' : sourceLang,
-										)
-									}
-									disabled={!sourceText}
-									className="rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10"
+									onClick={() => handleSpeak(translatedText, targetLang)}
+									disabled={!translatedText}
+									className=" text-muted-foreground hover:text-primary hover:bg-primary/10"
 								>
 									<Volume2 className="w-3.5 h-3.5" />
 								</Button>
@@ -253,85 +376,20 @@ export function Translator() {
 								<Button
 									variant="ghost"
 									size="icon-xs"
-									onClick={handleClear}
-									disabled={!sourceText}
-									className="rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+									onClick={handleCopy}
+									disabled={!translatedText}
+									className=" text-muted-foreground hover:text-primary hover:bg-primary/10"
 								>
-									<Eraser className="w-3.5 h-3.5" />
+									{copied ? (
+										<Check className="w-3.5 h-3.5 text-primary" />
+									) : (
+										<Copy className="w-3.5 h-3.5" />
+									)}
 								</Button>
 							</TooltipTrigger>
-							<TooltipContent>Clear</TooltipContent>
+							<TooltipContent>{copied ? 'Copied!' : 'Copy'}</TooltipContent>
 						</Tooltip>
 					</div>
-					<span className="text-[10px] tabular-nums text-muted-foreground/60">
-						{charCount > 0 && `${charCount}`}
-					</span>
-				</div>
-			</div>
-
-			{/* Result divider */}
-			<div className="mx-5 flex items-center gap-3">
-				<div className="flex-1 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
-				<div
-					className={`w-1.5 h-1.5 rounded-full transition-colors duration-300 ${
-						isTranslating ? 'bg-primary animate-pulse' : 'bg-border'
-					}`}
-				/>
-				<div className="flex-1 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
-			</div>
-
-			{/* Translation output */}
-			<div className="flex-1 flex flex-col px-5 pt-3 pb-2 min-h-0">
-				<div className="flex-1 min-h-[120px]">
-					{isTranslating ? (
-						<div className="flex items-center gap-1.5 pt-2">
-							<span className="w-1.5 h-1.5 rounded-full bg-primary pulse-dot" />
-							<span className="w-1.5 h-1.5 rounded-full bg-primary pulse-dot" />
-							<span className="w-1.5 h-1.5 rounded-full bg-primary pulse-dot" />
-						</div>
-					) : translatedText ? (
-						<p className="text-[15px] leading-relaxed text-foreground/90 whitespace-pre-wrap">
-							{translatedText}
-						</p>
-					) : (
-						<p className="text-[15px] leading-relaxed text-muted-foreground/40 italic">
-							Translation will appear here...
-						</p>
-					)}
-				</div>
-				<div className="flex items-center gap-1 pt-1">
-					<Tooltip>
-						<TooltipTrigger asChild>
-							<Button
-								variant="ghost"
-								size="icon-xs"
-								onClick={() => handleSpeak(translatedText, targetLang)}
-								disabled={!translatedText}
-								className="rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10"
-							>
-								<Volume2 className="w-3.5 h-3.5" />
-							</Button>
-						</TooltipTrigger>
-						<TooltipContent>Listen</TooltipContent>
-					</Tooltip>
-					<Tooltip>
-						<TooltipTrigger asChild>
-							<Button
-								variant="ghost"
-								size="icon-xs"
-								onClick={handleCopy}
-								disabled={!translatedText}
-								className="rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10"
-							>
-								{copied ? (
-									<Check className="w-3.5 h-3.5 text-primary" />
-								) : (
-									<Copy className="w-3.5 h-3.5" />
-								)}
-							</Button>
-						</TooltipTrigger>
-						<TooltipContent>{copied ? 'Copied!' : 'Copy'}</TooltipContent>
-					</Tooltip>
 				</div>
 			</div>
 
