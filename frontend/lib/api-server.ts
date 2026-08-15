@@ -1,6 +1,11 @@
 import 'server-only'
 import { cookies } from 'next/headers'
-import { RefreshTokenResponse, ServerResponse } from './models'
+import {
+	createServerResponseSchema,
+	RefreshTokenResponse,
+	RefreshTokenResponseSchema,
+	ServerResponse,
+} from './models'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
 
@@ -78,27 +83,26 @@ async function refreshAccessToken(): Promise<RefreshTokenResponse | null> {
 async function handleServerResponse<T>(
 	response: Response,
 ): Promise<ServerResponse<T>> {
+	const RefreshResponseSchema = createServerResponseSchema(
+		RefreshTokenResponseSchema,
+	)
+	const result: ServerResponse<T> = {
+		success: false,
+		status: response.status,
+		message: 'Failed to fetch data.',
+		content: undefined,
+	}
 	if (!response.ok) {
-		const data = await response
-			.json()
-			.then((res: ServerResponse<T>) => ({ ...res, status: response.status }))
-			.catch(() => null)
-
-		return {
-			success: false,
-			status: response.status,
-			message: data?.message ?? 'Failed to fetch data.',
-			content: undefined,
-		}
+		const data = await response.json()
+		const parsedDate = RefreshResponseSchema.parse(data)
+		return parsedDate as ServerResponse<T>
 	}
 
-	const serverResponse = await response
-		.json()
-		.then((res: ServerResponse<T>) => ({
-			...res,
-			status: response.status,
-		}))
+	const serverResponse = await response.json()
+	const parsedData = RefreshResponseSchema.parse(serverResponse)
+	if (!parsedData.success) {
+		return result
+	}
 
-	console.log('Server Response: ', serverResponse)
-	return serverResponse
+	return parsedData as ServerResponse<T>
 }

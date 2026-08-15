@@ -33,7 +33,7 @@ export async function signin(
 		}),
 		cache: 'no-store',
 	})
-	if (res.status !== 200 || !res.content) {
+	if (!res.success || !res.content) {
 		return { isSuccess: res.success, message: res.message ?? 'Sign in failed.' }
 	}
 
@@ -70,7 +70,7 @@ export async function signup(
 
 	console.log('Signup Response: ', res)
 
-	if (res.status !== 200 || !res.content) {
+	if (!res.success || !res.content) {
 		return { message: res.message ?? 'Sign up failed.' }
 	}
 
