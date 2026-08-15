@@ -13,7 +13,7 @@ export async function getWords(): Promise<Word[]> {
 		method: 'GET',
 		headers: { Accept: 'application/json' },
 	})
-	if (res.status !== 200 || !res.content) {
+	if (!res.success || !res.content) {
 		throw new WordsApiError(res.message ?? 'Failed to fetch words', res.status)
 	}
 	const rows = Array.isArray(res.content) ? res.content : res.content

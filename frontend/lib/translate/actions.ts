@@ -18,7 +18,7 @@ export async function translate(
 		signal: signal,
 	})
 
-	if (res.status !== 200 || !res.content) {
+	if (!res.success || !res.content) {
 		throw Error(res.message)
 	}
 

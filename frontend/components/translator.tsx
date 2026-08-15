@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useRef, useEffect } from 'react'
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import {
@@ -23,11 +23,8 @@ import {
 	Eraser,
 	Languages,
 } from 'lucide-react'
-import Link from 'next/link'
-import * as models from '@/lib/translate/models'
-import useDebounce from '@/app/(app)/translate/hooks/useDebounce'
 import TypingIndicator from './shared/typing-indicator'
-import { translate } from '@/lib/translate/actions'
+import useTranslator from '@/app/(app)/translate/hooks/useTranslator'
 
 const LANGUAGES = [
 	{ code: 'en', name: 'English', flag: 'EN' },
@@ -45,112 +42,26 @@ const LANGUAGES = [
 ] as const
 
 export function Translator() {
-	const [sourceText, setSourceText] = useState('')
-	const [phonetic, setPhonetic] = useState('')
-	const [translatedText, setTranslatedText] = useState('')
-	const [sourceLang, setSourceLang] = useState('auto')
-	const [targetLang, setTargetLang] = useState('vi')
-	const [wordMeanings, setWordMeanings] = useState<models.Meaning[]>([])
-	const [isTranslating, setIsTranslating] = useState(false)
-	const [copied, setCopied] = useState(false)
-	const [detectedLang, setDetectedLang] = useState<string | null>(null)
-	const debouncedSourceText = useDebounce(sourceText)
+	const {
+		isTranslating,
+		translatedText,
+		detectedLang,
+		wordMeanings,
+		phonetic,
+		sourceText,
+		setSourceText,
+		targetLang,
+		setTargetLang,
 
-	useEffect(() => {
-		if (debouncedSourceText.trim() === '') return
+		copied,
 
-		const controller = new AbortController()
-		const { signal } = controller
-		const fetchData = async () => {
-			setIsTranslating(true)
-			const response = await fetch('/api/translate', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ text: debouncedSourceText, target: targetLang }),
-				signal,
-			})
+		sourceLang,
+		setSourceLang,
 
-			if (!response.ok) {
-				throw new Error('Translation failed')
-			}
-
-			const res = await response.json()
-			if (!res.success || !res.content) {
-				throw new Error(res.message || 'Translation failed')
-			}
-
-			const data: models.TranslateResult = res.content
-
-			setTranslatedText(
-				data.translations
-					.map((translation: models.Translate) => {
-						return translation.translatedText
-					})
-					.join(', '),
-			)
-
-			if (data.definitions && data.definitions.length > 0) {
-				const phonetics = data.definitions[0].phonetics.filter(
-					(phonetic) => phonetic.text !== '',
-				)
-				setPhonetic(phonetics[0]?.text || '')
-				setWordMeanings(data.definitions[0].meanings)
-			} else {
-				setPhonetic('')
-				setWordMeanings([])
-			}
-
-			if (data.translations && data.translations.length > 0) {
-				setDetectedLang(data.translations[0].detectedLanguageCode || '')
-			}
-			setIsTranslating(false)
-		}
-		fetchData().catch((err) => {
-			if (err.name !== 'AbortError') {
-				console.error(err)
-			} else {
-				console.log('Fetching aborted')
-			}
-		})
-
-		return () => {
-			controller.abort()
-		}
-	}, [targetLang, debouncedSourceText])
-
-	const setEmpty = () => {
-		setPhonetic('')
-		setTranslatedText('')
-		setDetectedLang(null)
-		setWordMeanings([])
-	}
-
-	// TODO: Handle Abort Signal for changing target language
-	const handleTargetChange = (lang: string) => {
-		setTargetLang(lang)
-		if (sourceText.trim()) translate(sourceText, lang)
-	}
-
-	// TODO: Handle Abort Signal for swapping languages
-	const handleSwap = () => {
-		if (sourceLang === 'auto' || !translatedText) return
-		const prevSource = sourceLang
-		const prevTarget = targetLang
-		const prevTranslated = translatedText
-
-		setSourceLang(prevTarget)
-		setTargetLang(prevSource)
-		setSourceText(prevTranslated)
-		setEmpty()
-		translate(prevTranslated, prevSource)
-	}
-
-	const handleCopy = async () => {
-		if (!translatedText) return
-		await navigator.clipboard.writeText(translatedText)
-		setCopied(true)
-		setTimeout(() => setCopied(false), 1500)
-	}
+		handleCopy,
+		handleSwap,
+		handleClear,
+	} = useTranslator()
 
 	const handleSpeak = (text: string, lang: string) => {
 		if (!text || !window.speechSynthesis) return
@@ -159,11 +70,6 @@ export function Translator() {
 		utterance.lang = lang
 		utterance.rate = 0.9
 		window.speechSynthesis.speak(utterance)
-	}
-
-	const handleClear = () => {
-		setSourceText('')
-		setEmpty()
 	}
 
 	const charCount = sourceText.length
@@ -188,7 +94,10 @@ export function Translator() {
 
 			{/* Language selector bar */}
 			<div className="flex items-center gap-2 px-5 pb-3">
-				<Select value={sourceLang} onValueChange={setSourceLang}>
+				<Select
+					value={sourceLang}
+					onValueChange={(newLang) => setSourceLang(newLang)}
+				>
 					<SelectTrigger className="flex-1 h-9 text-xs font-medium">
 						<SelectValue />
 					</SelectTrigger>
@@ -227,7 +136,10 @@ export function Translator() {
 					<TooltipContent>Swap languages</TooltipContent>
 				</Tooltip>
 
-				<Select value={targetLang} onValueChange={handleTargetChange}>
+				<Select
+					value={targetLang}
+					onValueChange={(newLang) => setTargetLang(newLang)}
+				>
 					<SelectTrigger className="flex-1 h-9 text-xs font-medium">
 						<SelectValue />
 					</SelectTrigger>
@@ -260,7 +172,9 @@ export function Translator() {
 							</p>
 						)}
 
-						{sourceText.trim() !== '' && wordMeanings.length === 1 ? (
+						{isTranslating ? (
+							<TypingIndicator />
+						) : sourceText.trim() !== '' && wordMeanings?.length !== 0 ? (
 							<div className="flex flex-row gap-2">
 								{wordMeanings.map((meaning) => (
 									<div
@@ -268,7 +182,7 @@ export function Translator() {
 										className="flex items-center gap-2"
 									>
 										<p className="text-sm leading-relaxed text-muted-foreground">
-											{meaning.partOfSpeech}
+											{wordMeanings[0].partOfSpeech}
 										</p>
 									</div>
 								))}
@@ -276,22 +190,6 @@ export function Translator() {
 									// TODO: Handle open side panel and show definitions
 									onClick={() => console.log('Show side panel')}
 									className="text-sm leading-relaxed text-primary"
-								>
-									See word's definitions
-								</a>
-							</div>
-						) : sourceText.trim() !== '' && wordMeanings.length > 1 ? (
-							<div className="flex flex-row gap-2">
-								<div className="flex items-center gap-2">
-									<p className="text-sm leading-relaxed text-muted-foreground">
-										{wordMeanings[0].partOfSpeech} + {wordMeanings.length - 1}{' '}
-										more
-									</p>
-								</div>
-								<a
-									// TODO: Handle open side panel and show definitions
-									onClick={() => console.log('Show side panel')}
-									className="text-sm leading-relaxed text-primary font-medium text-fg-brand hover:underline cursor-pointer"
 								>
 									See word's definitions
 								</a>
