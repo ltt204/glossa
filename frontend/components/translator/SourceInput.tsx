@@ -1,0 +1,123 @@
+import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from '@/components/ui/tooltip'
+import { Volume2, Eraser } from 'lucide-react'
+import TypingIndicator from '../shared/typing-indicator'
+import { Meaning } from '@/lib/translate/models'
+
+export default function SourceInput({
+	sourceText,
+	setSourceText,
+	phonetic,
+	isTranslating,
+	wordMeanings,
+	charCount,
+	handleSpeak,
+	handleClear,
+	detectedLang,
+	sourceLang,
+}: {
+	sourceText: string
+	setSourceText: (text: string) => void
+	phonetic: string
+	isTranslating: boolean
+	wordMeanings: Meaning[]
+	charCount: number
+	handleSpeak: (text: string, lang: string) => void
+	handleClear: () => void
+	detectedLang: string
+	sourceLang: string
+}) {
+	return (
+		<div className="flex-1 flex flex-col px-3 py-2 min-h-0 border-2 border-solid rounded-md mx-4">
+			<div className="relative flex-1">
+				<Textarea
+					value={sourceText}
+					onChange={(e) => setSourceText(e.target.value)}
+					placeholder="Type or paste text..."
+					className="min-h-8 rounded-none resize-none border-none bg-transparent px-0 py-0 focus:outline-none text-[15px] leading-relaxed placeholder:text-muted-foreground/50 focus-visible:ring-0 focus-visible:border-transparent"
+				/>
+				{sourceText.trim() !== '' && phonetic && (
+					<p className="text-sm leading-relaxed text-muted-foreground whitespace-pre-wrap">
+						{phonetic}
+					</p>
+				)}
+
+				{isTranslating ? (
+					<TypingIndicator />
+				) : sourceText.trim() !== '' && wordMeanings?.length !== 0 ? (
+					<div className="flex flex-row gap-2">
+						{wordMeanings.map((meaning) => (
+							<div
+								key={meaning.partOfSpeech}
+								className="flex items-center gap-2"
+							>
+								<p className="text-sm leading-relaxed text-muted-foreground">
+									{wordMeanings[0].partOfSpeech}
+								</p>
+							</div>
+						))}
+						<a
+							// TODO: Handle open side panel and show definitions
+							onClick={() => console.log('Show side panel')}
+							className="text-sm leading-relaxed text-primary"
+						>
+							See word's definitions
+						</a>
+					</div>
+				) : (
+					sourceText.trim() !== '' &&
+					wordMeanings.length === 0 && (
+						<p className="text-sm leading-relaxed text-muted-foreground">
+							No definition found
+						</p>
+					)
+				)}
+			</div>
+			<div className="flex flex-1 items-center justify-between pt-1">
+				<div className="flex items-center gap-1">
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<Button
+								variant="ghost"
+								size="icon-xs"
+								onClick={() =>
+									handleSpeak(
+										sourceText,
+										sourceLang === 'auto' ? detectedLang || 'en' : sourceLang,
+									)
+								}
+								disabled={!sourceText}
+								className="text-muted-foreground hover:text-primary hover:bg-primary/10"
+							>
+								<Volume2 className="w-3.5 h-3.5" />
+							</Button>
+						</TooltipTrigger>
+						<TooltipContent>Listen</TooltipContent>
+					</Tooltip>
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<Button
+								variant="ghost"
+								size="icon-xs"
+								onClick={handleClear}
+								disabled={!sourceText}
+								className=" text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+							>
+								<Eraser className="w-3.5 h-3.5" />
+							</Button>
+						</TooltipTrigger>
+						<TooltipContent>Clear</TooltipContent>
+					</Tooltip>
+				</div>
+				<span className="text-[10px] tabular-nums text-muted-foreground/60">
+					{charCount > 0 && `${charCount}`}
+				</span>
+			</div>
+		</div>
+	)
+}

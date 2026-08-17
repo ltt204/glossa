@@ -45,8 +45,8 @@ export const TranslateSchema = z.object({
 export type Translate = z.infer<typeof TranslateSchema>
 
 export const TranslateResultSchema = z.object({
-	translations: z.array(TranslateSchema),
-	definitions: DictionaryEntrySchema.array(),
+	translations: z.array(TranslateSchema).default([]),
+	definitions: DictionaryEntrySchema.array().default([]),
 })
 
 export type TranslateResult = z.infer<typeof TranslateResultSchema>

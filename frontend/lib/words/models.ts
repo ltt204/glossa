@@ -47,7 +47,6 @@ export function normalizeWord(input: BackendWord): Word {
 	}
 }
 
-// Central error so callers can distinguish network/HTTP failures from app bugs.
 export class WordsApiError extends Error {
 	constructor(
 		message: string,
