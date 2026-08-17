@@ -1,10 +1,12 @@
 package translator
 
 import (
+	"context"
 	"glossa/internal/apperror"
 	"glossa/internal/responsedto"
 	"glossa/modules/definition"
 	"glossa/modules/translator/dtos"
+	"log"
 	"net/http"
 	"time"
 
@@ -32,82 +34,95 @@ func NewHandler(svc *TranslationService) *TranslationHandler {
 // @Security     BearerAuth
 // @Router       /api/translate [post]
 func (h *TranslationHandler) handleTranslate(ctx *gin.Context) {
-	var req dtos.TranslateRequest
+	reqCtx, cancel := context.WithTimeout(ctx.Request.Context(), 5*time.Second)
+	defer cancel()
 
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		appErr := apperror.ErrBadJsonStructure.WithErr(err)
+	select {
+	case <-reqCtx.Done():
+		appErr := apperror.TimeoutError.WithMessage("Request timed out.")
 		ctx.JSON(appErr.Status, appErr.ToGinMap())
 		return
+	default:
+		var req dtos.TranslateRequest
+		if err := ctx.ShouldBindJSON(&req); err != nil {
+			appErr := apperror.ErrBadJsonStructure.WithErr(err)
+			ctx.JSON(appErr.Status, appErr.ToGinMap())
+			return
+		}
+
+		result, err := h.translationSvc.Translate(reqCtx, req.Text, req.Target)
+		if err != nil {
+			appErr := apperror.FailedTranslateWord.WithErr(err)
+			appRes := responsedto.ErrorResponse(appErr)
+			ctx.JSON(appErr.Status, appRes)
+			return
+		}
+
+		appRes := responsedto.SuccessResponse("Translate success", result)
+		ctx.JSON(http.StatusOK, appRes)
 	}
-
-	result, err := h.translationSvc.Translate(ctx, req.Text, req.Target)
-	if err != nil {
-		appErr := apperror.FailedTranslateWord.WithErr(err)
-		appRes := responsedto.ErrorResponse(appErr)
-		ctx.JSON(appErr.Status, appRes)
-		return
-	}
-
-	appRes := responsedto.SuccessResponse("Translate success", result)
-
-	ctx.JSON(http.StatusOK, appRes)
 }
 
 func (h *TranslationHandler) handleTranslateMock(ctx *gin.Context) {
-	appRes := responsedto.SuccessResponse("Translate success", dtos.WordResult{
-		Translations: []dtos.Translation{
-			{
-				TranslatedText:       "Mock Translation Response",
-				DetectedLanguageCode: "en",
-			},
-		},
-		Definitions: []definition.WordDefinitions{
-			{
-				Word: "Mock Definition",
-				Phonetics: []definition.Phonetic{
-					{
-						Text: "/mock/phonetic/",
-					},
-				},
-				Meanings: []definition.Meaning{
-					{
-						PartOfSpeech: "mock",
-						Definitions: []definition.Definition{
-							{
-								Definition: "Mock definition",
-								Example:    "Mock example",
-								Synonyms:   []string{"mock", "synonym"},
-							},
-						},
-					},
-					{
-						PartOfSpeech: "mock",
-						Definitions: []definition.Definition{
-							{
-								Definition: "Mock definition",
-								Example:    "Mock example",
-								Synonyms:   []string{"mock", "synonym"},
-							},
-						},
-					},
-					{
-						PartOfSpeech: "mock",
-						Definitions: []definition.Definition{
-							{
-								Definition: "Mock definition",
-								Example:    "Mock example",
-								Synonyms:   []string{"mock", "synonym"},
-							},
-						},
-					},
+	select {
+	case <-ctx.Request.Context().Done():
+		log.Println("Canceled handleTranslateMock")
+		return
+	case <-time.After(2 * time.Second):
+
+		appRes := responsedto.SuccessResponse("Translate success", dtos.WordResult{
+			Translations: []dtos.Translation{
+				{
+					TranslatedText:       "Mock Translation Response",
+					DetectedLanguageCode: "en",
 				},
 			},
-		},
-	})
+			Definitions: []definition.WordDefinitions{
+				{
+					Word: "Mock Definition",
+					Phonetics: []definition.Phonetic{
+						{
+							Text: "/mock/phonetic/",
+						},
+					},
+					Meanings: []definition.Meaning{
+						{
+							PartOfSpeech: "mock_verb",
+							Definitions: []definition.Definition{
+								{
+									Definition: "Mock definition",
+									Example:    "Mock example",
+									Synonyms:   []string{"mock", "synonym"},
+								},
+							},
+						},
+						{
+							PartOfSpeech: "mock_noun",
+							Definitions: []definition.Definition{
+								{
+									Definition: "Mock definition",
+									Example:    "Mock example",
+									Synonyms:   []string{"mock", "synonym"},
+								},
+							},
+						},
+						{
+							PartOfSpeech: "mock_adjective",
+							Definitions: []definition.Definition{
+								{
+									Definition: "Mock definition",
+									Example:    "Mock example",
+									Synonyms:   []string{"mock", "synonym"},
+								},
+							},
+						},
+					},
+				},
+			},
+		})
 
-	time.Sleep(2 * time.Second)
-
-	ctx.JSON(http.StatusOK, appRes)
+		ctx.JSON(http.StatusOK, appRes)
+	}
 }
 
 func (h *TranslationHandler) RegisterRoutes(rg *gin.RouterGroup) {

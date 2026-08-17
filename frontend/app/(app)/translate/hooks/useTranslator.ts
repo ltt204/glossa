@@ -4,7 +4,8 @@ import {
 	TranslateResult,
 	TranslateResultSchema,
 } from '@/lib/translate/models'
-import { useEffect, useState } from 'react'
+import { abort } from 'process'
+import { useEffect, useRef, useState } from 'react'
 
 export default function useTranslator() {
 	const [isTranslating, setIsTranslating] = useState(false)
@@ -40,13 +41,21 @@ export default function useTranslator() {
 	const [translatedResult, setTranslatedResult] =
 		useState<TranslateResult | null>(null)
 
+	const abortControllerRef = useRef<AbortController | null>(null)
+
 	useEffect(() => {
+		if (abortControllerRef.current) {
+			abortControllerRef.current.abort()
+		}
+
 		if (debouncedSourceText.trim() === '') {
+			setIsTranslating(false)
 			setTranslatedResult(null)
 			return
 		}
 
 		const controller = new AbortController()
+		abortControllerRef.current = controller
 		const { signal } = controller
 		const fetchData = async () => {
 			setIsTranslating(true)
@@ -58,6 +67,7 @@ export default function useTranslator() {
 			})
 
 			if (!response.ok) {
+				console.log(`Resposne is not ok: ${response}`)
 				setIsTranslating(false)
 				throw new Error('Translation failed')
 			}
@@ -81,10 +91,6 @@ export default function useTranslator() {
 				console.log('Fetching aborted')
 			}
 		})
-
-		return () => {
-			controller.abort()
-		}
 	}, [targetLang, debouncedSourceText])
 
 	if (!translatedResult) {

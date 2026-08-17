@@ -81,33 +81,41 @@ func (refRepo *tokenRepository) GenerateTokens(ctx context.Context, userID strin
 		UserId:    userID,
 		TokenHash: refreshToken,
 	})
+
+	log.Println("DEBUG[token_repository.generate_tokens] raw_ref_token: ", rawRefToken)
+	log.Println("DEBUG[token_repository.generate_tokens] refresh_token: ", refreshToken)
+
 	if err != nil {
+		log.Println("Error[token_repository.generate_tokens]: ", err)
 		return "", "", err
 	}
 
 	return accessToken, rawRefToken, nil
 }
 
-func (refRepo *tokenRepository) GenerateAcccessTokens(ctx context.Context, refreshToken string) (string, string, error) {
+func (refRepo *tokenRepository) GenerateAcccessTokens(ctx context.Context, rawRefToken string) (string, string, error) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
-	hash := sha256.Sum256([]byte(refreshToken))
+	hash := sha256.Sum256([]byte(rawRefToken))
 	hashedRefreshToken := hex.EncodeToString(hash[:])
+
+	log.Println("DEBUG[token_repository.generate_access_tokens] raw_ref_token: ", rawRefToken)
+	log.Println("DEBUG[token_repository.generate_access_tokens] hashed_refresh_token: ", hashedRefreshToken)
 
 	var refreshTokenDO RefreshToken
 	row := refRepo.pool.QueryRow(ctx, "SELECT * FROM refresh_token WHERE token_hash = $1", hashedRefreshToken)
 	if err := row.Scan(&refreshTokenDO.ID, &refreshTokenDO.UserID, &refreshTokenDO.TokenHash, &refreshTokenDO.CreatedAt, &refreshTokenDO.UpdatedAt, &refreshTokenDO.DeletedAt); err != nil {
-		log.Println("Error: ", err)
+		log.Println("Error[token_repository.generate_access_tokens]: ", err)
 		return "", "", apperror.InternalServerError.WithMessage("Something went wrong")
 	}
 
 	refRepo.RemoveAllByUserId(ctx, refreshTokenDO.UserID)
-	accessToken, refreshToken, err := refRepo.GenerateTokens(ctx, refreshTokenDO.UserID)
+	accessToken, rawRefToken, err := refRepo.GenerateTokens(ctx, refreshTokenDO.UserID)
 
 	if err != nil {
 		return "", "", err
 	}
 
-	return accessToken, refreshToken, nil
+	return accessToken, rawRefToken, nil
 }

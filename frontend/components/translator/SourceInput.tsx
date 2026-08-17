@@ -51,20 +51,20 @@ export default function SourceInput({
 					<TypingIndicator />
 				) : sourceText.trim() !== '' && wordMeanings?.length !== 0 ? (
 					<div className="flex flex-row gap-2">
-						{wordMeanings.map((meaning) => (
-							<div
-								key={meaning.partOfSpeech}
-								className="flex items-center gap-2"
-							>
+						<div className="flex items-center gap-2">
+							<p className="text-sm leading-relaxed text-muted-foreground">
+								{wordMeanings[0].partOfSpeech}
+							</p>
+							{wordMeanings.length > 1 && (
 								<p className="text-sm leading-relaxed text-muted-foreground">
-									{wordMeanings[0].partOfSpeech}
+									+ {wordMeanings.length - 1} more meanings
 								</p>
-							</div>
-						))}
+							)}
+						</div>
 						<a
 							// TODO: Handle open side panel and show definitions
 							onClick={() => console.log('Show side panel')}
-							className="text-sm leading-relaxed text-primary"
+							className="text-xs leading-relaxed text-primary"
 						>
 							See word's definitions
 						</a>

@@ -1,28 +1,5 @@
 'use client'
-
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from '@/components/ui/select'
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipTrigger,
-} from '@/components/ui/tooltip'
-import {
-	ArrowRightLeft,
-	Copy,
-	Check,
-	Volume2,
-	Eraser,
-	Languages,
-} from 'lucide-react'
-import TypingIndicator from './shared/typing-indicator'
+import { Languages } from 'lucide-react'
 import useTranslator from '@/app/(app)/translate/hooks/useTranslator'
 import LanguageSelectorBar from './translator/LanguageSelectorBar'
 import SourceInput from './translator/SourceInput'

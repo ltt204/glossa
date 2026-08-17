@@ -10,6 +10,12 @@ var (
 		Status:  http.StatusInternalServerError,
 	}
 
+	TimeoutError = &AppError{
+		Code:    "TIMEOUT_ERROR",
+		Message: "Request timed out.",
+		Status:  http.StatusGatewayTimeout,
+	}
+
 	InternalServerError = &AppError{
 		Code:    "INTERNAL_SERVER_ERROR",
 		Message: "Internal server error.",

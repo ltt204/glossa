@@ -3,7 +3,6 @@ package middleware
 import (
 	"glossa/internal/apperror"
 	"glossa/internal/responsedto"
-	"log"
 	"os"
 	"strings"
 
@@ -14,8 +13,6 @@ import (
 func AuthMiddleware(jwtSecret []byte) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
-
-		log.Println(authHeader)
 
 		if authHeader == "admin" && os.Getenv("GIN_MODE") == "debug" {
 			c.Next()

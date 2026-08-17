@@ -54,7 +54,7 @@ func (authRepo *authRepository) Signin(ctx context.Context, req SigninRequest) (
 
 	accessToken, refreshToken, err := authRepo.refRepo.GenerateTokens(ctx, user.ID)
 	if err != nil {
-		return SigninResponse{}, apperror.ErrFailedToCreate
+		return SigninResponse{}, apperror.ErrFailedToCreate.WithMessage(err.Error())
 	}
 
 	return SigninResponse{
