@@ -13,6 +13,29 @@ export default function useTranslator() {
 	const [sourceLang, setSourceLang] = useState('auto')
 	const [copied, setCopied] = useState(false)
 
+	const handleSwap = () => {
+		if (sourceLang === 'auto' || !translatedText) return
+		const prevSource = sourceLang
+		const prevTarget = targetLang
+		const prevTranslated = translatedText
+
+		setSourceLang(prevTarget)
+		setTargetLang(prevSource)
+		setSourceText(prevTranslated)
+	}
+
+	const handleCopy = async () => {
+		if (!translatedText) return
+		await navigator.clipboard.writeText(translatedText)
+		setCopied(true)
+		setTimeout(() => setCopied(false), 1500)
+	}
+
+	const handleClear = () => {
+		setSourceText('')
+		setTranslatedResult(null)
+	}
+
 	const debouncedSourceText = useDebounce(sourceText)
 	const [translatedResult, setTranslatedResult] =
 		useState<TranslateResult | null>(null)
@@ -64,45 +87,42 @@ export default function useTranslator() {
 		}
 	}, [targetLang, debouncedSourceText])
 
+	if (!translatedResult) {
+		return {
+			isTranslating,
+			translatedText: '',
+			detectedLang: '',
+			wordMeanings: [],
+			phonetic: '',
+			sourceText,
+			setSourceText,
+			targetLang,
+			setTargetLang,
+			sourceLang,
+			setSourceLang,
+			copied,
+			handleCopy,
+			handleSwap,
+			handleClear,
+		}
+	}
+
 	const translatedText =
-		translatedResult?.translations
+		translatedResult.translations
 			.map((translation: Translate) => {
 				return translation.translatedText
 			})
 			.join(', ') || ''
 
-	const detectedLang =
-		translatedResult?.translations?.[0]?.detectedLanguageCode || ''
-	const defintions = translatedResult?.definitions
+	const detectedLang = translatedResult.translations[0].detectedLanguageCode
 
-	const wordMeanings = defintions?.[0]?.meanings || []
-	const phonetic = defintions?.[0]?.phonetics?.filter(
-		(phonetic) => phonetic.text !== '',
-	)[0]?.text
+	const firstDefinition = translatedResult.definitions[0]
+	const wordMeanings = firstDefinition?.meanings || []
+	const phonetic =
+		firstDefinition?.phonetics.filter((phonetic) => phonetic.text !== '')[0]
+			?.text || ''
 
-	const handleSwap = () => {
-		if (sourceLang === 'auto' || !translatedText) return
-		const prevSource = sourceLang
-		const prevTarget = targetLang
-		const prevTranslated = translatedText
-
-		setSourceLang(prevTarget)
-		setTargetLang(prevSource)
-		setSourceText(prevTranslated)
-	}
-
-	const handleCopy = async () => {
-		if (!translatedText) return
-		await navigator.clipboard.writeText(translatedText)
-		setCopied(true)
-		setTimeout(() => setCopied(false), 1500)
-	}
-
-	const handleClear = () => {
-		setSourceText('')
-		setTranslatedResult(null)
-	}
-
+	// TODO: return also list of definition for displaying within the drawer
 	return {
 		isTranslating,
 		translatedText,
