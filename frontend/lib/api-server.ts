@@ -6,6 +6,7 @@ import {
 	RefreshTokenResponseSchema,
 	ServerResponse,
 } from './models'
+import z from 'zod'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
 
@@ -83,23 +84,21 @@ async function refreshAccessToken(): Promise<RefreshTokenResponse | null> {
 async function handleServerResponse<T>(
 	response: Response,
 ): Promise<ServerResponse<T>> {
-	const RefreshResponseSchema = createServerResponseSchema(
-		RefreshTokenResponseSchema,
-	)
+	const ServerResponseSchema = createServerResponseSchema(z.any())
+
 	const result: ServerResponse<T> = {
 		success: false,
-		status: response.status,
 		message: 'Failed to fetch data.',
-		content: undefined,
+		content: null,
 	}
 	if (!response.ok) {
 		const data = await response.json()
-		const parsedDate = RefreshResponseSchema.parse(data)
+		const parsedDate = ServerResponseSchema.parse(data)
 		return parsedDate as ServerResponse<T>
 	}
 
 	const serverResponse = await response.json()
-	const parsedData = RefreshResponseSchema.parse(serverResponse)
+	const parsedData = ServerResponseSchema.parse(serverResponse)
 	if (!parsedData.success) {
 		return result
 	}

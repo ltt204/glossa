@@ -14,7 +14,7 @@ export async function getWords(): Promise<Word[]> {
 		headers: { Accept: 'application/json' },
 	})
 	if (!res.success || !res.content) {
-		throw new WordsApiError(res.message ?? 'Failed to fetch words', res.status)
+		throw new WordsApiError(res.message ?? 'Failed to fetch words')
 	}
 	const rows = Array.isArray(res.content) ? res.content : res.content
 	if (!Array.isArray(rows)) return []
@@ -31,7 +31,7 @@ export async function createWord(input: CreateWordInput): Promise<Word> {
 		},
 	)
 	const row = 'content' in res ? res.content : res
-	if (!row) throw new WordsApiError('Invalid response payload', res.status)
+	if (!row) throw new WordsApiError('Invalid response payload')
 	return normalizeWord(row)
 }
 
@@ -40,8 +40,8 @@ export async function deleteWord(id: string): Promise<void> {
 		method: 'DELETE',
 	})
 
-	if (res.status !== 204) {
-		throw new WordsApiError(res.message ?? 'Failed to delete word', res.status)
+	if (!res.success || !res.content) {
+		throw new WordsApiError(res.message ?? 'Failed to delete word')
 	}
 
 	return res.content

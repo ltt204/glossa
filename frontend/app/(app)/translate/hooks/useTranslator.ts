@@ -1,5 +1,9 @@
 import useDebounce from '@/app/hooks/useDebounce'
-import { Meaning, Translate, TranslateResult } from '@/lib/translate/models'
+import {
+	Translate,
+	TranslateResult,
+	TranslateResultSchema,
+} from '@/lib/translate/models'
 import { useEffect, useState } from 'react'
 
 export default function useTranslator() {
@@ -31,17 +35,16 @@ export default function useTranslator() {
 			})
 
 			if (!response.ok) {
+				setIsTranslating(false)
 				throw new Error('Translation failed')
 			}
 
 			const res = await response.json()
-			if (!res.success || !res.content) {
-				throw new Error(res.message || 'Translation failed')
-			}
+			const parseResponse = TranslateResultSchema.safeParse(res.content)
 
-			const data: TranslateResult = res.content
-
+			const data = parseResponse.data
 			if (!data || data.translations.length === 0) {
+				setIsTranslating(false)
 				throw new Error('Translation not found')
 			}
 
@@ -69,11 +72,11 @@ export default function useTranslator() {
 			.join(', ') || ''
 
 	const detectedLang =
-		translatedResult?.translations[0].detectedLanguageCode || ''
+		translatedResult?.translations?.[0]?.detectedLanguageCode || ''
 	const defintions = translatedResult?.definitions
 
-	const wordMeanings = defintions?.[0].meanings || []
-	const phonetic = defintions?.[0].phonetics?.filter(
+	const wordMeanings = defintions?.[0]?.meanings || []
+	const phonetic = defintions?.[0]?.phonetics?.filter(
 		(phonetic) => phonetic.text !== '',
 	)[0]?.text
 

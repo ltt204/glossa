@@ -1,7 +1,7 @@
 import { apiFetch } from '@/lib/api-server'
 import { NextRequest, NextResponse } from 'next/server'
 
-export async function POST(request: NextRequest) {
+export async function POST(request: NextRequest): Promise<NextResponse> {
 	try {
 		const { text, target } = await request.json()
 		const signal = request.signal
@@ -12,6 +12,7 @@ export async function POST(request: NextRequest) {
 			signal: signal,
 		})
 
+		console.log(`ROUTE file system response: ${JSON.stringify(res)}\n`)
 		return NextResponse.json(res)
 	} catch (error: any) {
 		if (error === 'AbortSignal') {

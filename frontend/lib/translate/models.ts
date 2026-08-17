@@ -1,38 +1,52 @@
-export type TranslateRequest = {
-	text: string
-	target: string
-}
+import { z } from 'zod'
 
-export type TranslateResult = {
-	translations: Translate[]
-	definitions: DictionaryEntry[]
-}
+export const TranslateRequestSchema = z.object({
+	text: z.string(),
+	target: z.string(),
+})
 
-export type DictionaryEntry = {
-	word: string
-	phonetics: Phonetic[]
-	origin: string
-	meanings: Meaning[]
-}
+export type TranslateRequest = z.infer<typeof TranslateRequestSchema>
 
-export type Phonetic = {
-	text: string
-	audio: string
-}
+export const PhoneticSchema = z.object({
+	text: z.string(),
+	audio: z.string(),
+})
 
-export type Meaning = {
-	partOfSpeech: string
-	definitions: Definition[]
-}
+export type Phonetic = z.infer<typeof PhoneticSchema>
 
-export type Definition = {
-	definition: string
-	example: string
-	synonyms: string[]
-	antonyms: string[]
-}
+export const DefinitionSchema = z.object({
+	definition: z.string(),
+	example: z.string().default(''),
+	synonyms: z.array(z.string()).default([]),
+	antonyms: z.array(z.string()).default([]),
+})
 
-export type Translate = {
-	translatedText: string
-	detectedLanguageCode: string
-}
+export const MeaningSchema = z.object({
+	partOfSpeech: z.string(),
+	definitions: z.array(DefinitionSchema),
+})
+
+export type Meaning = z.infer<typeof MeaningSchema>
+
+export const DictionaryEntrySchema = z.object({
+	word: z.string(),
+	phonetics: PhoneticSchema.array(),
+	origin: z.string(),
+	meanings: MeaningSchema.array(),
+})
+
+export type DictionaryEntry = z.infer<typeof DictionaryEntrySchema>
+
+export const TranslateSchema = z.object({
+	translatedText: z.string(),
+	detectedLanguageCode: z.string(),
+})
+
+export type Translate = z.infer<typeof TranslateSchema>
+
+export const TranslateResultSchema = z.object({
+	translations: z.array(TranslateSchema),
+	definitions: DictionaryEntrySchema.array(),
+})
+
+export type TranslateResult = z.infer<typeof TranslateResultSchema>

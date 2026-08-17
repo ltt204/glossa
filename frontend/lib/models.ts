@@ -1,13 +1,5 @@
 import z from 'zod'
 
-export type ServerResponse<T> = {
-	success: boolean
-	message: string
-	errorCode?: string
-	timestamp?: string
-	content?: T
-}
-
 export const RefreshTokenResponseSchema = z.object({
 	accessToken: z.string(),
 	refreshToken: z.string(),
@@ -23,6 +15,10 @@ export function createServerResponseSchema<T extends z.ZodType>(
 		message: z.string(),
 		errorCode: z.string().optional(),
 		timestamp: z.string().optional(),
-		content: contentSchema,
+		content: contentSchema.nullable(),
 	})
 }
+
+export type ServerResponse<T> = z.infer<
+	ReturnType<typeof createServerResponseSchema<z.ZodType<T>>>
+>
