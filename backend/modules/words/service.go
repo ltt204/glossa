@@ -1,6 +1,10 @@
 package words
 
-import "context"
+import (
+	"context"
+	"glossa/internal/apperror"
+	"log"
+)
 
 type WordService struct {
 	Wr *WordRepository
@@ -10,11 +14,12 @@ func NewWordService(wr *WordRepository) *WordService {
 	return &WordService{Wr: wr}
 }
 
-func (ws *WordService) Save(ctx context.Context, word Word) (WordResponse, error) {
+func (ws *WordService) Save(ctx context.Context, word Word) (WordResponse, *apperror.AppError) {
 	word, err := ws.Wr.Save(ctx, word)
 
 	if err != nil {
-		return WordResponse{}, err
+		log.Println("[WORD-MODULE] Save error: ", err)
+		return WordResponse{}, apperror.InternalServerError.WithMessage("Failed to save word")
 	}
 	return word.ToResponse(), nil
 }

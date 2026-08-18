@@ -89,7 +89,6 @@ async function handleServerResponse<T>(
 	const result: ServerResponse<T> = {
 		success: false,
 		message: 'Failed to fetch data.',
-		content: null,
 	}
 	if (!response.ok) {
 		const data = await response.json()

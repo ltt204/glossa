@@ -4,7 +4,6 @@ import {
 	TranslateResult,
 	TranslateResultSchema,
 } from '@/lib/translate/models'
-import { abort } from 'process'
 import { useEffect, useRef, useState } from 'react'
 
 export default function useTranslator() {
@@ -98,7 +97,6 @@ export default function useTranslator() {
 			setTargetLang,
 			sourceLang,
 			setSourceLang,
-
 			handleSwap,
 			handleClear,
 		}

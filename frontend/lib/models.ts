@@ -15,7 +15,7 @@ export function createServerResponseSchema<T extends z.ZodType>(
 		message: z.string(),
 		errorCode: z.string().optional(),
 		timestamp: z.string().optional(),
-		content: contentSchema.nullable(),
+		content: contentSchema.optional(),
 	})
 }
 

@@ -90,9 +90,9 @@ func (h *TranslationHandler) handleTranslateMock(ctx *gin.Context) {
 							PartOfSpeech: "mock_verb",
 							Definitions: []definition.Definition{
 								{
-									Definition: "Mock definition",
-									Example:    "Mock example",
-									Synonyms:   []string{"mock", "synonym"},
+									Definition: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+									Example:    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+									Synonyms:   []string{"Lorem", "ipsum", "dolor", "sit", "amet", "consectetur", "adipiscing", "elit", "sed", "do", "eiusmod", "tempor", "incididunt", "ut", "labore", "et", "dolore", "magna", "aliqua"},
 								},
 							},
 						},
@@ -100,9 +100,9 @@ func (h *TranslationHandler) handleTranslateMock(ctx *gin.Context) {
 							PartOfSpeech: "mock_noun",
 							Definitions: []definition.Definition{
 								{
-									Definition: "Mock definition",
-									Example:    "Mock example",
-									Synonyms:   []string{"mock", "synonym"},
+									Definition: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+									Example:    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+									Synonyms:   []string{"Lorem", "ipsum", "dolor", "sit", "amet", "consectetur", "adipiscing", "elit", "sed", "do", "eiusmod", "tempor", "incididunt", "ut", "labore", "et", "dolore", "magna", "aliqua"},
 								},
 							},
 						},
@@ -110,9 +110,9 @@ func (h *TranslationHandler) handleTranslateMock(ctx *gin.Context) {
 							PartOfSpeech: "mock_adjective",
 							Definitions: []definition.Definition{
 								{
-									Definition: "Mock definition",
-									Example:    "Mock example",
-									Synonyms:   []string{"mock", "synonym"},
+									Definition: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+									Example:    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+									Synonyms:   []string{"Lorem", "ipsum", "dolor", "sit", "amet", "consectetur", "adipiscing", "elit", "sed", "do", "eiusmod", "tempor", "incididunt", "ut", "labore", "et", "dolore", "magna", "aliqua"},
 								},
 							},
 						},
@@ -126,5 +126,5 @@ func (h *TranslationHandler) handleTranslateMock(ctx *gin.Context) {
 }
 
 func (h *TranslationHandler) RegisterRoutes(rg *gin.RouterGroup) {
-	rg.POST("/translate", h.handleTranslate)
+	rg.POST("/translate", h.handleTranslateMock)
 }

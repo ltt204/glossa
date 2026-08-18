@@ -65,6 +65,7 @@ export function Translator() {
 				{/* Translation output */}
 				<TranslationOutput
 					isTranslating={isTranslating}
+					sourceLang={sourceLang}
 					sourceText={sourceText}
 					translatedText={translatedText}
 					targetLang={targetLang}

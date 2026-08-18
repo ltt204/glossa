@@ -2,8 +2,9 @@ package words
 
 import (
 	"fmt"
+	"glossa/internal/apperror"
+	"glossa/internal/responsedto"
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -38,25 +39,24 @@ func (h *WordsHandler) handleSaveWord(ctx *gin.Context) {
 	var req WordSavingRequest
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"status_code": "401",
-			"error":       fmt.Errorf("Bad body structure"),
-			"timestamp":   time.Now(),
-		})
-	}
-
-	result, err := h.wordSvc.Save(ctx, req.ToWord())
-
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": fmt.Errorf("Save Word Error: %w", err).Error(),
-		})
+		ctx.JSON(http.StatusBadRequest, responsedto.ErrorResponse(apperror.ErrBadJsonStructure))
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"content": result,
-	})
+	fmt.Println("REQ:", req)
+
+	result, err := h.wordSvc.Save(ctx, req.ToWord())
+
+	fmt.Println("RES:", result)
+
+	fmt.Println("ERR:", err)
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, responsedto.ErrorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, responsedto.SuccessResponse("Word saved successfully", result))
 }
 
 // GetWords

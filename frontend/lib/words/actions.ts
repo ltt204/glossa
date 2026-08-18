@@ -1,38 +1,37 @@
 'use server'
 import { apiFetch } from '../api-server'
-import {
-	WordsApiError,
-	normalizeWord,
-	Word,
-	BackendWord,
-	CreateWordInput,
-} from './models'
+import { WordsApiError, Word, CreateWordInput } from './models'
 
 export async function getWords(): Promise<Word[]> {
-	const res = await apiFetch('api/words', {
+	const res = await apiFetch<Word[]>('api/words', {
 		method: 'GET',
 		headers: { Accept: 'application/json' },
 	})
+
 	if (!res.success || !res.content) {
 		throw new WordsApiError(res.message ?? 'Failed to fetch words')
 	}
-	const rows = Array.isArray(res.content) ? res.content : res.content
-	if (!Array.isArray(rows)) return []
-	return rows.map(normalizeWord)
+
+	if (!Array.isArray(res.content)) return []
+	return res.content
 }
 
-export async function createWord(input: CreateWordInput): Promise<Word> {
-	const res = await apiFetch<{ content?: BackendWord } | BackendWord>(
-		`/api/words`,
-		{
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(input),
-		},
-	)
-	const row = 'content' in res ? res.content : res
-	if (!row) throw new WordsApiError('Invalid response payload')
-	return normalizeWord(row)
+export async function saveWord(input: CreateWordInput): Promise<Word> {
+	console.log('REQ:', JSON.stringify(input, null, 2))
+
+	const res = await apiFetch<Word>(`api/words`, {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify(input),
+	})
+
+	console.log('RES:', res)
+
+	if (!res.success || !res.content) {
+		throw new WordsApiError(res.message ?? 'Failed to save word')
+	}
+
+	return res.content
 }
 
 export async function deleteWord(id: string): Promise<void> {

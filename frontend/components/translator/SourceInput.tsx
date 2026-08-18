@@ -69,14 +69,14 @@ export default function SourceInput({
 							</p>
 							{wordMeanings.length > 1 && (
 								<p className="text-sm leading-relaxed text-muted-foreground">
-									+ {wordMeanings.length - 1} more meanings
+									+ {wordMeanings.length - 1} more
 								</p>
 							)}
 						</div>
 						<Drawer open={open} onOpenChange={setOpen} direction="right">
 							<DrawerTrigger>
 								<a
-									className="text-xs leading-relaxed text-primary cursor-pointer hover:underline"
+									className="text-sm leading-relaxed text-primary cursor-pointer hover:underline"
 									onClick={() => setOpen(!open)}
 								>
 									See word's definitions

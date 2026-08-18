@@ -9,12 +9,12 @@ type WordSavingRequest struct {
 
 type WordResponse struct {
 	ID         string `json:"id"`
-	UserId     string `json:"user_id"`
+	UserId     string `json:"userId"`
 	Origin     string `json:"origin"`
-	SourceLang string `json:"source_lang"`
+	SourceLang string `json:"sourceLang"`
 	Translated string `json:"translated"`
-	TargetLang string `json:"target_lang"`
-	IsSaved    bool   `json:"is_saved"`
+	TargetLang string `json:"targetLang"`
+	IsSaved    bool   `json:"isSaved"`
 }
 
 // Success Response Wrappers for Swagger

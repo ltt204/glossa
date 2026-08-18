@@ -82,7 +82,7 @@ func (svc *TranslationService) fetchGoogleTranslate(ctx context.Context, input s
 			TargetLanguageCode: target,
 		})
 		if err == nil {
-			log.Println("Translated Word: ", result)
+			log.Printf("Translated Word: %v \n", result)
 			return result.Translations, nil
 		}
 
