@@ -12,7 +12,6 @@ export default function useTranslator() {
 	const [sourceText, setSourceText] = useState('')
 	const [targetLang, setTargetLang] = useState('vi')
 	const [sourceLang, setSourceLang] = useState('auto')
-	const [copied, setCopied] = useState(false)
 
 	const handleSwap = () => {
 		if (sourceLang === 'auto' || !translatedText) return
@@ -23,13 +22,6 @@ export default function useTranslator() {
 		setSourceLang(prevTarget)
 		setTargetLang(prevSource)
 		setSourceText(prevTranslated)
-	}
-
-	const handleCopy = async () => {
-		if (!translatedText) return
-		await navigator.clipboard.writeText(translatedText)
-		setCopied(true)
-		setTimeout(() => setCopied(false), 1500)
 	}
 
 	const handleClear = () => {
@@ -106,8 +98,7 @@ export default function useTranslator() {
 			setTargetLang,
 			sourceLang,
 			setSourceLang,
-			copied,
-			handleCopy,
+
 			handleSwap,
 			handleClear,
 		}
@@ -145,8 +136,6 @@ export default function useTranslator() {
 		sourceLang,
 		setSourceLang,
 
-		copied,
-		handleCopy,
 		handleSwap,
 		handleClear,
 	}

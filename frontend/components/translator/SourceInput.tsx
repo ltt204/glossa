@@ -5,9 +5,21 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from '@/components/ui/tooltip'
-import { Volume2, Eraser } from 'lucide-react'
+import { Eraser } from 'lucide-react'
 import TypingIndicator from '../shared/typing-indicator'
 import { Meaning } from '@/lib/translate/models'
+import { useState } from 'react'
+import {
+	Drawer,
+	DrawerContent,
+	DrawerDescription,
+	DrawerHeader,
+	DrawerTitle,
+	DrawerTrigger,
+} from '@/components/ui/drawer'
+import DefinitionItem from './DefinitionItem.'
+import SpeakButton from '../shared/SpeakButton'
+import ClearButton from '../shared/ClearButton'
 
 export default function SourceInput({
 	sourceText,
@@ -16,7 +28,6 @@ export default function SourceInput({
 	isTranslating,
 	wordMeanings,
 	charCount,
-	handleSpeak,
 	handleClear,
 	detectedLang,
 	sourceLang,
@@ -27,11 +38,12 @@ export default function SourceInput({
 	isTranslating: boolean
 	wordMeanings: Meaning[]
 	charCount: number
-	handleSpeak: (text: string, lang: string) => void
 	handleClear: () => void
 	detectedLang: string
 	sourceLang: string
 }) {
+	const [open, setOpen] = useState(false)
+
 	return (
 		<div className="flex-1 flex flex-col px-3 py-2 min-h-0 border-2 border-solid rounded-md mx-4">
 			<div className="relative flex-1">
@@ -61,13 +73,46 @@ export default function SourceInput({
 								</p>
 							)}
 						</div>
-						<a
-							// TODO: Handle open side panel and show definitions
-							onClick={() => console.log('Show side panel')}
-							className="text-xs leading-relaxed text-primary"
-						>
-							See word's definitions
-						</a>
+						<Drawer open={open} onOpenChange={setOpen} direction="right">
+							<DrawerTrigger>
+								<a
+									className="text-xs leading-relaxed text-primary cursor-pointer hover:underline"
+									onClick={() => setOpen(!open)}
+								>
+									See word's definitions
+								</a>
+							</DrawerTrigger>
+							<DrawerContent className="flex flex-col">
+								<DrawerHeader>
+									<div className="flex flex-row gap-2">
+										<DrawerTitle>{sourceText}</DrawerTitle>
+										<SpeakButton
+											sourceLang={sourceLang}
+											detectedLang={detectedLang}
+											sourceText={sourceText}
+										/>
+									</div>
+									{wordMeanings.length === 1 && (
+										<DrawerDescription>
+											{wordMeanings[0].partOfSpeech}
+										</DrawerDescription>
+									)}
+								</DrawerHeader>
+								<div className="flex-1 scroll-fade overflow-y-auto p-4">
+									{wordMeanings.map((meaning, index) => (
+										<div key={index}>
+											{meaning.definitions.map((definition, index) => (
+												<DefinitionItem
+													key={index}
+													partOfSpeech={meaning.partOfSpeech}
+													definition={definition}
+												/>
+											))}
+										</div>
+									))}
+								</div>
+							</DrawerContent>
+						</Drawer>
 					</div>
 				) : (
 					sourceText.trim() !== '' &&
@@ -80,39 +125,12 @@ export default function SourceInput({
 			</div>
 			<div className="flex flex-1 items-center justify-between pt-1">
 				<div className="flex items-center gap-1">
-					<Tooltip>
-						<TooltipTrigger asChild>
-							<Button
-								variant="ghost"
-								size="icon-xs"
-								onClick={() =>
-									handleSpeak(
-										sourceText,
-										sourceLang === 'auto' ? detectedLang || 'en' : sourceLang,
-									)
-								}
-								disabled={!sourceText}
-								className="text-muted-foreground hover:text-primary hover:bg-primary/10"
-							>
-								<Volume2 className="w-3.5 h-3.5" />
-							</Button>
-						</TooltipTrigger>
-						<TooltipContent>Listen</TooltipContent>
-					</Tooltip>
-					<Tooltip>
-						<TooltipTrigger asChild>
-							<Button
-								variant="ghost"
-								size="icon-xs"
-								onClick={handleClear}
-								disabled={!sourceText}
-								className=" text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-							>
-								<Eraser className="w-3.5 h-3.5" />
-							</Button>
-						</TooltipTrigger>
-						<TooltipContent>Clear</TooltipContent>
-					</Tooltip>
+					<SpeakButton
+						sourceLang={sourceLang}
+						detectedLang={detectedLang}
+						sourceText={sourceText}
+					/>
+					<ClearButton sourceText={sourceText} handleClear={handleClear} />
 				</div>
 				<span className="text-[10px] tabular-nums text-muted-foreground/60">
 					{charCount > 0 && `${charCount}`}

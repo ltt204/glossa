@@ -21,6 +21,8 @@ export const DefinitionSchema = z.object({
 	antonyms: z.array(z.string()).default([]),
 })
 
+export type Definition = z.infer<typeof DefinitionSchema>
+
 export const MeaningSchema = z.object({
 	partOfSpeech: z.string(),
 	definitions: z.array(DefinitionSchema),

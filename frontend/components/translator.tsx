@@ -17,24 +17,12 @@ export function Translator() {
 		targetLang,
 		setTargetLang,
 
-		copied,
-
 		sourceLang,
 		setSourceLang,
 
-		handleCopy,
-		handleSwap,
 		handleClear,
+		handleSwap,
 	} = useTranslator()
-
-	const handleSpeak = (text: string, lang: string) => {
-		if (!text || !window.speechSynthesis) return
-		window.speechSynthesis.cancel()
-		const utterance = new SpeechSynthesisUtterance(text)
-		utterance.lang = lang
-		utterance.rate = 0.9
-		window.speechSynthesis.speak(utterance)
-	}
 
 	const charCount = sourceText.length
 	return (
@@ -70,7 +58,6 @@ export function Translator() {
 					isTranslating={isTranslating}
 					wordMeanings={wordMeanings}
 					charCount={charCount}
-					handleSpeak={handleSpeak}
 					handleClear={handleClear}
 					detectedLang={detectedLang}
 					sourceLang={sourceLang}
@@ -81,9 +68,6 @@ export function Translator() {
 					sourceText={sourceText}
 					translatedText={translatedText}
 					targetLang={targetLang}
-					handleSpeak={handleSpeak}
-					handleCopy={handleCopy}
-					copied={copied}
 				/>
 			</div>
 
