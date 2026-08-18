@@ -12,6 +12,7 @@ export const SignInResponseSchema = z.object({
 })
 
 export const SignUpResponseSchema = z.object({
+	user: UserSchema,
 	accessToken: z.string(),
 	refreshToken: z.string(),
 })

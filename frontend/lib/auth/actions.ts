@@ -24,7 +24,7 @@ export async function signin(
 		}
 	}
 
-	const res = await apiFetch<SignInResponse | null>(`api/auth/signin`, {
+	const res = await apiFetch<SignInResponse>(`api/auth/signin`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({
@@ -37,12 +37,12 @@ export async function signin(
 		return { isSuccess: res.success, message: res.message ?? 'Sign in failed.' }
 	}
 
-	const { accessToken, refreshToken } = res.content
-	if (!accessToken || !refreshToken) {
+	const { user, accessToken, refreshToken } = res.content
+	if (!accessToken || !refreshToken || !user) {
 		return { isSuccess: false, message: 'Sign in Failed.' }
 	}
 
-	await setCredentialsCookie(accessToken, refreshToken)
+	await setCredentialsCookie(accessToken, refreshToken, user.id)
 
 	redirect('/translate')
 }
@@ -74,17 +74,21 @@ export async function signup(
 		return { message: res.message ?? 'Sign up failed.' }
 	}
 
-	const { accessToken, refreshToken } = res.content
-	if (!accessToken || !refreshToken) {
+	const { user, accessToken, refreshToken } = res.content
+	if (!accessToken || !refreshToken || !user) {
 		return { message: 'Sign up Failed.' }
 	}
 
-	await setCredentialsCookie(accessToken, refreshToken)
+	await setCredentialsCookie(accessToken, refreshToken, user.id)
 
 	redirect('/translate')
 }
 
-async function setCredentialsCookie(accessToken: string, refreshToken: string) {
+async function setCredentialsCookie(
+	accessToken: string,
+	refreshToken: string,
+	userId: string,
+) {
 	const cookieStore = await cookies()
 	const secure = process.env.NODE_ENV === 'production'
 
@@ -98,6 +102,14 @@ async function setCredentialsCookie(accessToken: string, refreshToken: string) {
 
 	cookieStore.set('refresh_token', refreshToken, {
 		httpOnly: true,
+		secure,
+		sameSite: 'lax',
+		path: '/',
+		maxAge: 7 * 24 * 60 * 60,
+	})
+
+	cookieStore.set('user_id', userId, {
+		httpOnly: false,
 		secure,
 		sameSite: 'lax',
 		path: '/',
