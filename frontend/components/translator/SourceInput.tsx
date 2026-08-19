@@ -31,6 +31,7 @@ export default function SourceInput({
 	handleClear,
 	detectedLang,
 	sourceLang,
+	setSidebarOpen,
 }: {
 	sourceText: string
 	setSourceText: (text: string) => void
@@ -41,9 +42,8 @@ export default function SourceInput({
 	handleClear: () => void
 	detectedLang: string
 	sourceLang: string
+	setSidebarOpen: () => void
 }) {
-	const [open, setOpen] = useState(false)
-
 	return (
 		<div className="flex-1 flex flex-col px-3 py-2 min-h-0 border-2 border-solid rounded-md mx-4">
 			<div className="relative flex-1">
@@ -72,47 +72,15 @@ export default function SourceInput({
 									+ {wordMeanings.length - 1} more
 								</p>
 							)}
+							<a
+								className="text-sm leading-relaxed text-primary cursor-pointer hover:underline"
+								onClick={setSidebarOpen}
+							>
+								{wordMeanings.length === 1
+									? "See word's definitions"
+									: "See words' definitions"}
+							</a>
 						</div>
-						<Drawer open={open} onOpenChange={setOpen} direction="right">
-							<DrawerTrigger>
-								<a
-									className="text-sm leading-relaxed text-primary cursor-pointer hover:underline"
-									onClick={() => setOpen(!open)}
-								>
-									See word's definitions
-								</a>
-							</DrawerTrigger>
-							<DrawerContent className="flex flex-col">
-								<DrawerHeader>
-									<div className="flex flex-row gap-2">
-										<DrawerTitle>{sourceText}</DrawerTitle>
-										<SpeakButton
-											sourceLang={sourceLang}
-											detectedLang={detectedLang}
-											sourceText={sourceText}
-										/>
-									</div>
-									{wordMeanings.length === 1 && (
-										<DrawerDescription>
-											{wordMeanings[0].partOfSpeech}
-										</DrawerDescription>
-									)}
-								</DrawerHeader>
-								<div className="flex-1 scroll-fade overflow-y-auto p-4">
-									{wordMeanings.map((meaning, index) => (
-										<div key={index}>
-											{meaning.definitions.map((definition, index) => (
-												<DefinitionItem
-													key={index}
-													partOfSpeech={meaning.partOfSpeech}
-													definition={definition}
-												/>
-											))}
-										</div>
-									))}
-								</div>
-							</DrawerContent>
-						</Drawer>
 					</div>
 				) : (
 					sourceText.trim() !== '' &&

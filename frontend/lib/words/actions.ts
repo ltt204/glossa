@@ -17,8 +17,6 @@ export async function getWords(): Promise<Word[]> {
 }
 
 export async function saveWord(input: CreateWordInput): Promise<Word> {
-	console.log('REQ:', JSON.stringify(input, null, 2))
-
 	const res = await apiFetch<Word>(`api/words`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },

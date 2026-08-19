@@ -4,8 +4,24 @@ import useTranslator from '@/app/(app)/translate/hooks/useTranslator'
 import LanguageSelectorBar from './translator/LanguageSelectorBar'
 import SourceInput from './translator/SourceInput'
 import TranslationOutput from './translator/TranslationOutput'
+import SpeakButton from './shared/SpeakButton'
+import { DrawerDescription } from './ui/drawer'
+import DefinitionItem from './translator/DefinitionItem.'
+import { ScrollArea } from './ui/scroll-area'
 
-export function Translator() {
+export function Translator({
+	setSidebarOpen,
+}: {
+	setSidebarOpen: (
+		args: Omit<
+			{
+				title: React.ReactNode
+				children: React.ReactNode
+			},
+			'onClose'
+		>,
+	) => void
+}) {
 	const {
 		isTranslating,
 		translatedText,
@@ -61,6 +77,42 @@ export function Translator() {
 					handleClear={handleClear}
 					detectedLang={detectedLang}
 					sourceLang={sourceLang}
+					setSidebarOpen={() =>
+						setSidebarOpen({
+							title: (
+								<div className="flex flex-col gap-2">
+									<div className="flex flex-row gap-2">
+										{sourceText}
+										<SpeakButton
+											sourceLang={sourceLang}
+											detectedLang={detectedLang}
+											sourceText={sourceText}
+										/>
+									</div>
+									{wordMeanings.length === 1 && (
+										<DrawerDescription>
+											{wordMeanings[0].partOfSpeech}
+										</DrawerDescription>
+									)}
+								</div>
+							),
+							children: (
+								<div>
+									{wordMeanings.map((meaning, index) => (
+										<div key={index}>
+											{meaning.definitions.map((definition, index) => (
+												<DefinitionItem
+													key={index}
+													partOfSpeech={meaning.partOfSpeech}
+													definition={definition}
+												/>
+											))}
+										</div>
+									))}
+								</div>
+							),
+						})
+					}
 				/>
 				{/* Translation output */}
 				<TranslationOutput
