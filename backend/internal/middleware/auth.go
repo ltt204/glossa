@@ -15,6 +15,7 @@ func AuthMiddleware(jwtSecret []byte) gin.HandlerFunc {
 		authHeader := c.GetHeader("Authorization")
 
 		if authHeader == "admin" && os.Getenv("GIN_MODE") == "debug" {
+			c.Set("user_id", "00000000-0000-0000-0000-000000000000")
 			c.Next()
 			return
 		}

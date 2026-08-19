@@ -24,10 +24,11 @@ func (ws *WordService) Save(ctx context.Context, word Word) (WordResponse, *appe
 	return word.ToResponse(), nil
 }
 
-func (ws *WordService) GetAll(ctx context.Context) ([]WordResponse, error) {
+func (ws *WordService) GetAll(ctx context.Context) ([]WordResponse, *apperror.AppError) {
 	words, err := ws.Wr.GetAll(ctx)
 	if err != nil {
-		return []WordResponse{}, err
+		log.Println("[WORD-MODULE] GetAll error: ", err)
+		return []WordResponse{}, apperror.InternalServerError.WithMessage("Failed to get words")
 	}
 	var res []WordResponse = make([]WordResponse, 0, len(words))
 	for _, word := range words {
@@ -56,10 +57,20 @@ func (ws *WordService) GetByUserId(ctx context.Context, userId string) ([]WordRe
 	return res, nil
 }
 
-func (ws *WordService) Delete(ctx context.Context, wordId string) error {
-	return ws.Wr.Delete(ctx, wordId)
+func (ws *WordService) Delete(ctx context.Context, wordId string) *apperror.AppError {
+	err := ws.Wr.Delete(ctx, wordId)
+	if err != nil {
+		log.Println("[WORD-MODULE] Delete error: ", err)
+		return apperror.InternalServerError.WithMessage("Failed to delete word")
+	}
+	return nil
 }
 
-func (ws *WordService) DeleteBulk(ctx context.Context, wordIds []string) error {
-	return ws.Wr.DeleteBulk(ctx, wordIds)
+func (ws *WordService) DeleteBulk(ctx context.Context, wordIds []string) *apperror.AppError {
+	err := ws.Wr.DeleteBulk(ctx, wordIds)
+	if err != nil {
+		log.Println("[WORD-MODULE] DeleteBulk error: ", err)
+		return apperror.InternalServerError.WithMessage("Failed to delete words")
+	}
+	return nil
 }

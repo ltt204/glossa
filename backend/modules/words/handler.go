@@ -1,7 +1,6 @@
 package words
 
 import (
-	"fmt"
 	"glossa/internal/apperror"
 	"glossa/internal/responsedto"
 	"net/http"
@@ -42,14 +41,7 @@ func (h *WordsHandler) handleSaveWord(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, responsedto.ErrorResponse(apperror.ErrBadJsonStructure))
 		return
 	}
-
-	fmt.Println("REQ:", req)
-
 	result, err := h.wordSvc.Save(ctx, req.ToWord())
-
-	fmt.Println("RES:", result)
-
-	fmt.Println("ERR:", err)
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, responsedto.ErrorResponse(err))
@@ -72,14 +64,10 @@ func (h *WordsHandler) handleSaveWord(ctx *gin.Context) {
 func (h *WordsHandler) handleGetWords(ctx *gin.Context) {
 	result, err := h.wordSvc.GetAll(ctx)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": fmt.Errorf("Get Words Error: %w", err).Error(),
-		})
+		ctx.JSON(http.StatusInternalServerError, responsedto.ErrorResponse(err))
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{
-		"content": result,
-	})
+	ctx.JSON(http.StatusOK, responsedto.SuccessResponse("Words fetched successfully", result))
 }
 
 // DeleteWord
@@ -101,9 +89,7 @@ func (h *WordsHandler) handleDeleteWord(ctx *gin.Context) {
 	err := h.wordSvc.Delete(ctx, wordId)
 
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": fmt.Errorf("Get Words Error: %w", err).Error(),
-		})
+		ctx.JSON(http.StatusInternalServerError, responsedto.ErrorResponse(err))
 		return
 	}
 

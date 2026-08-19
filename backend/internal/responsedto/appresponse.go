@@ -34,7 +34,7 @@ type ApplicationErrorResponse struct {
 	Success   bool      `json:"success"`
 	Message   string    `json:"message"`
 	Timestamp time.Time `json:"timestamp"`
-	ErrorCode string    `json:"error_code"`
+	ErrorCode string    `json:"errorCode"`
 }
 
 func ErrorResponse(appError *apperror.AppError) ApplicationErrorResponse {
