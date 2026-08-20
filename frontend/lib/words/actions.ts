@@ -32,12 +32,12 @@ export async function saveWord(input: CreateWordInput): Promise<Word> {
 	return res.content
 }
 
-export async function deleteWord(id: string): Promise<void> {
-	const res = await apiFetch<void>(`/api/words/${id}`, {
+export async function unsaveWord(id: string): Promise<void> {
+	const res = await apiFetch<void>(`api/words/${id}`, {
 		method: 'DELETE',
 	})
 
-	if (!res.success || !res.content) {
+	if (!res.success) {
 		throw new WordsApiError(res.message ?? 'Failed to delete word')
 	}
 

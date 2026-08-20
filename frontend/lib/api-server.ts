@@ -90,10 +90,19 @@ async function handleServerResponse<T>(
 		success: false,
 		message: 'Failed to fetch data.',
 	}
-	if (!response.ok) {
+	console.log('response: ', response)
+
+	if (!response.ok && response.status !== 204) {
 		const data = await response.json()
 		const parsedDate = ServerResponseSchema.parse(data)
 		return parsedDate as ServerResponse<T>
+	}
+
+	if (response.status === 204) {
+		return {
+			success: true,
+			message: 'OK',
+		}
 	}
 
 	const serverResponse = await response.json()
