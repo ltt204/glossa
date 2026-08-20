@@ -1,11 +1,5 @@
 import { Definition } from '@/lib/translate/models'
-import {
-	Field,
-	FieldContent,
-	FieldDescription,
-	FieldLabel,
-	FieldTitle,
-} from '../ui/field'
+import { Field, FieldContent, FieldDescription, FieldTitle } from '../ui/field'
 import { Badge } from '../ui/badge'
 
 export default function DefinitionItem({

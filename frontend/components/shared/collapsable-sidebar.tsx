@@ -14,19 +14,18 @@ export default function CollapsableSidebar({
 	onClose,
 	width = 360,
 }: CollapsibleSidebarProps) {
-	const {
-		titlePayload: title,
-		contentPayload: payload,
-		ChildrenComponent,
-		TitleComponent,
-	} = useCollapsableSidebarStore()
+	const { titlePayload, contentPayload } = useCollapsableSidebarStore()
+
+	if (!titlePayload || !contentPayload) {
+		return null
+	}
 
 	return (
 		<div
 			className={`
 				transition-[width,opacity] duration 300 ease-in-out flex-shrink-0
 				border-l border-primary/20 shadow-sm bg-background overflow-hidden
-				rounded-md
+				rounded-md ml-4
 				${isOpen ? 'opacity-100' : 'opacity-0 border-l-0'}
 			`}
 			style={{
@@ -35,10 +34,15 @@ export default function CollapsableSidebar({
 		>
 			<aside className="flex flex-col h-full">
 				{/* Inner Container */}
-				<div className="flex flex-col items-center px-4 pt-4 pb-2 h-full">
+				<div className="flex flex-col items-center px-4 pt-4 pb-2 h-full gap-2">
 					{/* Abstract Header */}
 					<div className="flex flex-row items-baselinpe justify-between w-full">
-						{TitleComponent && <TitleComponent title={title} />}
+						{titlePayload.titleComponent && (
+							<titlePayload.titleComponent
+								title={titlePayload.title}
+								props={titlePayload.props}
+							/>
+						)}
 						<Button
 							className="w-8 h-8 bg-transparent hover:bg-primary/20"
 							onClick={onClose}
@@ -49,7 +53,11 @@ export default function CollapsableSidebar({
 
 					{/* Abstract Content */}
 					<ScrollArea className="flex-1 max-h-[calc(100vh-8rem)] px-4 py-2 w-full">
-						{ChildrenComponent && <ChildrenComponent payload={payload} />}
+						{contentPayload.contentComponent && (
+							<contentPayload.contentComponent
+								payload={contentPayload.payload}
+							/>
+						)}
 					</ScrollArea>
 				</div>
 			</aside>

@@ -5,9 +5,11 @@ import LanguageSelectorBar from './translator/language-selector-bar'
 import SourceInput from './translator/source-input'
 import TranslationOutput from './translator/translation-output'
 import { useCollapsableSidebarStore } from '@/hooks/use-collapsable-sidebar'
+import DefinitionSidebarTitle from './translator/definition-sidebar-title'
+import DefinitionSidebarContent from './translator/definition-sidebar-content'
 
 export function Translator() {
-	// const { isOpen, openSidebar, closeSidebar } = useCollapsableSidebarStore()
+	const { openSidebar } = useCollapsableSidebarStore()
 
 	const {
 		isTranslating,
@@ -64,41 +66,21 @@ export function Translator() {
 					detectedLang={detectedLang}
 					sourceLang={sourceLang}
 					setSidebarOpen={() =>
-						// setSidebarOpen({
-						// 	title: (
-						// 		<div className="flex flex-col gap-2">
-						// 			<div className="flex flex-row gap-2">
-						// 				{sourceText}
-						// 				<SpeakButton
-						// 					sourceLang={sourceLang}
-						// 					detectedLang={detectedLang}
-						// 					sourceText={sourceText}
-						// 				/>
-						// 			</div>
-						// 			{wordMeanings.length === 1 && (
-						// 				<DrawerDescription>
-						// 					{wordMeanings[0].partOfSpeech}
-						// 				</DrawerDescription>
-						// 			)}
-						// 		</div>
-						// 	),
-						// 	children: (
-						// 		<div>
-						// 			{wordMeanings.map((meaning, index) => (
-						// 				<div key={index}>
-						// 					{meaning.definitions.map((definition, index) => (
-						// 						<DefinitionItem
-						// 							key={index}
-						// 							partOfSpeech={meaning.partOfSpeech}
-						// 							definition={definition}
-						// 						/>
-						// 					))}
-						// 				</div>
-						// 			))}
-						// 		</div>
-						// 	),
-						// })
-						{}
+						openSidebar(
+							{
+								title: sourceText,
+								props: {
+									sourceLang,
+									detectedLang,
+									partOfSpeech: wordMeanings[0].partOfSpeech,
+								},
+								titleComponent: DefinitionSidebarTitle,
+							},
+							{
+								payload: wordMeanings,
+								contentComponent: DefinitionSidebarContent,
+							},
+						)
 					}
 				/>
 				{/* Translation output */}

@@ -2,7 +2,7 @@ import { Textarea } from '@/components/ui/textarea'
 import TypingIndicator from '../shared/typing-indicator'
 import { Meaning } from '@/lib/translate/models'
 import SpeakButton from '../shared/speak-button'
-import ClearButton from '../shared/ClearButton'
+import ClearButton from '../shared/clear-button'
 
 export default function SourceInput({
 	sourceText,

@@ -1,17 +1,24 @@
 import { create } from 'zustand'
 
+export interface TitlePayloadProps {
+	title: string
+	props?: Record<string, any>
+	titleComponent: React.ElementType
+}
+
+export interface ContentPayloadProps {
+	payload?: Record<string, any>
+	contentComponent: React.ElementType
+}
+
 interface CollapsableSidebarProps {
 	isOpen: boolean
-	titlePayload: string
-	contentPayload: Record<string, any> | null
-	TitleComponent: React.ElementType | null
-	ChildrenComponent: React.ElementType | null
+	titlePayload: TitlePayloadProps | null
+	contentPayload: ContentPayloadProps | null
 	// Actions
 	openSidebar: (
-		title: string,
-		contentPayload: Record<string, any>,
-		titleComponent: React.ElementType,
-		childrenComponent: React.ElementType,
+		titlePayload: TitlePayloadProps,
+		contentPayload: ContentPayloadProps,
 	) => void
 	closeSidebar: () => void
 	toggleSidebar: () => void
@@ -20,23 +27,19 @@ interface CollapsableSidebarProps {
 export const useCollapsableSidebarStore = create<CollapsableSidebarProps>(
 	(set) => ({
 		isOpen: false,
-		titlePayload: '',
-		contentPayload: {},
-		TitleComponent: null,
-		ChildrenComponent: null,
+		titlePayload: null,
+		contentPayload: null,
 		openSidebar: (
-			title: string,
-			contentPayload: Record<string, any>,
-			titleComponent: React.ElementType,
-			childrenComponent: React.ElementType,
-		) =>
+			titlePayload: TitlePayloadProps,
+			contentPayload: ContentPayloadProps,
+		) => {
+			console.log('openSidebar', titlePayload, contentPayload)
 			set({
 				isOpen: true,
-				titlePayload: title,
-				contentPayload: contentPayload,
-				TitleComponent: titleComponent,
-				ChildrenComponent: childrenComponent,
-			}),
+				titlePayload,
+				contentPayload,
+			})
+		},
 		closeSidebar: () => set({ isOpen: false }),
 		toggleSidebar: () => set({ isOpen: !useCollapsableSidebarStore().isOpen }),
 	}),

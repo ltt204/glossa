@@ -1,7 +1,7 @@
 'use client'
 
 import { Translator } from '@/components/translator'
-import CollapsableSidebar from '@/components/translator/collapsable-sidebar'
+import CollapsableSidebar from '@/components/shared/collapsable-sidebar'
 import { useCollapsableSidebarStore } from '@/hooks/use-collapsable-sidebar'
 import { Button } from '@/components/ui/button'
 import { Star } from 'lucide-react'
@@ -30,9 +30,22 @@ export default function Home() {
 				</div>
 				<Button
 					className="w-12 h-12 rounded-full bg-primary/80 mt-12"
-					onClick={() =>
-						openSidebar('Saved words', words, WordsSidebarTitle, WordsList)
-					}
+					onClick={() => {
+						if (isOpen) {
+							closeSidebar()
+							return
+						}
+
+						openSidebar(
+							{
+								title: 'Saved words',
+								titleComponent: WordsSidebarTitle,
+							},
+							{
+								contentComponent: WordsList,
+							},
+						)
+					}}
 				>
 					<Star />
 				</Button>

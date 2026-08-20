@@ -7,9 +7,6 @@ import { useWordStore } from '@/app/(app)/words/hooks/useWord'
 
 export default function WordsList() {
 	const { words, handleUnsave } = useWordStore()
-
-	console.log('word store', words)
-
 	return (
 		<div>
 			{words.map((word, index) => (
