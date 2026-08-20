@@ -1,24 +1,7 @@
-import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipTrigger,
-} from '@/components/ui/tooltip'
-import { Eraser } from 'lucide-react'
 import TypingIndicator from '../shared/typing-indicator'
 import { Meaning } from '@/lib/translate/models'
-import { useState } from 'react'
-import {
-	Drawer,
-	DrawerContent,
-	DrawerDescription,
-	DrawerHeader,
-	DrawerTitle,
-	DrawerTrigger,
-} from '@/components/ui/drawer'
-import DefinitionItem from './DefinitionItem.'
-import SpeakButton from '../shared/SpeakButton'
+import SpeakButton from '../shared/speak-button'
 import ClearButton from '../shared/ClearButton'
 
 export default function SourceInput({

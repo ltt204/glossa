@@ -16,8 +16,8 @@ export default function DefinitionItem({
 	definition: Definition
 }) {
 	return (
-		<FieldLabel className="mb-2">
-			<Field className="p-0" orientation="horizontal">
+		<div className="mb-2 rounded-md px-4 py-2 border-2 border-primary/20">
+			<Field orientation="horizontal">
 				<FieldContent>
 					<FieldTitle className="text-primary">{partOfSpeech}</FieldTitle>
 					<FieldDescription>{definition.definition}</FieldDescription>
@@ -33,6 +33,6 @@ export default function DefinitionItem({
 					</div>
 				</FieldContent>
 			</Field>
-		</FieldLabel>
+		</div>
 	)
 }

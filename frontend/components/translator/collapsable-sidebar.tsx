@@ -1,28 +1,32 @@
 import { Button } from '../ui/button'
 import { X } from 'lucide-react'
 import { ScrollArea } from '../ui/scroll-area'
+import { useCollapsableSidebarStore } from '@/hooks/use-collapsable-sidebar'
 
 interface CollapsibleSidebarProps {
 	isOpen: boolean
 	onClose: () => void
-	title?: React.ReactNode // Optional title for the header
 	width?: number // Configurable width, defaults to 360
-	children: React.ReactNode
 }
 
 export default function CollapsableSidebar({
 	isOpen,
 	onClose,
 	width = 360,
-	title,
-	children,
 }: CollapsibleSidebarProps) {
+	const {
+		titlePayload: title,
+		contentPayload: payload,
+		ChildrenComponent,
+		TitleComponent,
+	} = useCollapsableSidebarStore()
+
 	return (
 		<div
 			className={`
 				transition-[width,opacity] duration 300 ease-in-out flex-shrink-0
 				border-l border-primary/20 shadow-sm bg-background overflow-hidden
-				rounded-md ml-12
+				rounded-md
 				${isOpen ? 'opacity-100' : 'opacity-0 border-l-0'}
 			`}
 			style={{
@@ -31,10 +35,10 @@ export default function CollapsableSidebar({
 		>
 			<aside className="flex flex-col h-full">
 				{/* Inner Container */}
-				<div className="flex flex-col items-center justify-between pt-4 pb-2">
+				<div className="flex flex-col items-center px-4 pt-4 pb-2 h-full">
 					{/* Abstract Header */}
-					<div className="flex flex-row items-baseline justify-between w-full px-4">
-						{title}
+					<div className="flex flex-row items-baselinpe justify-between w-full">
+						{TitleComponent && <TitleComponent title={title} />}
 						<Button
 							className="w-8 h-8 bg-transparent hover:bg-primary/20"
 							onClick={onClose}
@@ -44,8 +48,8 @@ export default function CollapsableSidebar({
 					</div>
 
 					{/* Abstract Content */}
-					<ScrollArea className="max-h-[calc(100vh-10rem)] px-4 py-2">
-						{children}
+					<ScrollArea className="flex-1 max-h-[calc(100vh-8rem)] px-4 py-2 w-full">
+						{ChildrenComponent && <ChildrenComponent payload={payload} />}
 					</ScrollArea>
 				</div>
 			</aside>

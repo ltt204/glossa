@@ -1,27 +1,14 @@
 'use client'
 import { Languages } from 'lucide-react'
 import useTranslator from '@/app/(app)/translate/hooks/useTranslator'
-import LanguageSelectorBar from './translator/LanguageSelectorBar'
-import SourceInput from './translator/SourceInput'
-import TranslationOutput from './translator/TranslationOutput'
-import SpeakButton from './shared/SpeakButton'
-import { DrawerDescription } from './ui/drawer'
-import DefinitionItem from './translator/DefinitionItem.'
-import { ScrollArea } from './ui/scroll-area'
+import LanguageSelectorBar from './translator/language-selector-bar'
+import SourceInput from './translator/source-input'
+import TranslationOutput from './translator/translation-output'
+import { useCollapsableSidebarStore } from '@/hooks/use-collapsable-sidebar'
 
-export function Translator({
-	setSidebarOpen,
-}: {
-	setSidebarOpen: (
-		args: Omit<
-			{
-				title: React.ReactNode
-				children: React.ReactNode
-			},
-			'onClose'
-		>,
-	) => void
-}) {
+export function Translator() {
+	// const { isOpen, openSidebar, closeSidebar } = useCollapsableSidebarStore()
+
 	const {
 		isTranslating,
 		translatedText,
@@ -40,7 +27,6 @@ export function Translator({
 		handleSwap,
 	} = useTranslator()
 
-	const charCount = sourceText.length
 	return (
 		<div className="flex flex-col h-full">
 			{/* Header */}
@@ -73,45 +59,46 @@ export function Translator({
 					phonetic={phonetic || ''}
 					isTranslating={isTranslating}
 					wordMeanings={wordMeanings}
-					charCount={charCount}
+					charCount={sourceText.length}
 					handleClear={handleClear}
 					detectedLang={detectedLang}
 					sourceLang={sourceLang}
 					setSidebarOpen={() =>
-						setSidebarOpen({
-							title: (
-								<div className="flex flex-col gap-2">
-									<div className="flex flex-row gap-2">
-										{sourceText}
-										<SpeakButton
-											sourceLang={sourceLang}
-											detectedLang={detectedLang}
-											sourceText={sourceText}
-										/>
-									</div>
-									{wordMeanings.length === 1 && (
-										<DrawerDescription>
-											{wordMeanings[0].partOfSpeech}
-										</DrawerDescription>
-									)}
-								</div>
-							),
-							children: (
-								<div>
-									{wordMeanings.map((meaning, index) => (
-										<div key={index}>
-											{meaning.definitions.map((definition, index) => (
-												<DefinitionItem
-													key={index}
-													partOfSpeech={meaning.partOfSpeech}
-													definition={definition}
-												/>
-											))}
-										</div>
-									))}
-								</div>
-							),
-						})
+						// setSidebarOpen({
+						// 	title: (
+						// 		<div className="flex flex-col gap-2">
+						// 			<div className="flex flex-row gap-2">
+						// 				{sourceText}
+						// 				<SpeakButton
+						// 					sourceLang={sourceLang}
+						// 					detectedLang={detectedLang}
+						// 					sourceText={sourceText}
+						// 				/>
+						// 			</div>
+						// 			{wordMeanings.length === 1 && (
+						// 				<DrawerDescription>
+						// 					{wordMeanings[0].partOfSpeech}
+						// 				</DrawerDescription>
+						// 			)}
+						// 		</div>
+						// 	),
+						// 	children: (
+						// 		<div>
+						// 			{wordMeanings.map((meaning, index) => (
+						// 				<div key={index}>
+						// 					{meaning.definitions.map((definition, index) => (
+						// 						<DefinitionItem
+						// 							key={index}
+						// 							partOfSpeech={meaning.partOfSpeech}
+						// 							definition={definition}
+						// 						/>
+						// 					))}
+						// 				</div>
+						// 			))}
+						// 		</div>
+						// 	),
+						// })
+						{}
 					}
 				/>
 				{/* Translation output */}
