@@ -3,10 +3,23 @@ import { ArrowRight, Star } from 'lucide-react'
 import SpeakButton from '../shared/speak-button'
 import { Button } from '../ui/button'
 import { Item, ItemActions, ItemContent, ItemDescription } from '../ui/item'
-import { useWordStore } from '@/app/(app)/words/hooks/useWord'
+import { useWordStore } from '@/app/(app)/words/hooks/use-word'
 
 export default function WordsList() {
-	const { words, handleUnsave } = useWordStore()
+	const { words, handleUnsave, isFetching, isError, error } = useWordStore()
+
+	if (isError) {
+		return <div>Error: {error?.message}</div>
+	}
+
+	if (isFetching) {
+		return <div>Loading...</div>
+	}
+
+	if (words.length === 0) {
+		return <div>No saved words</div>
+	}
+
 	return (
 		<div>
 			{words.map((word, index) => (

@@ -8,7 +8,7 @@ import { Star } from 'lucide-react'
 import WordsList from '@/components/words/words-sidebar-content'
 import WordsSidebarTitle from '@/components/words/words-sidebar-title'
 import { useEffect } from 'react'
-import { useWordStore } from '../words/hooks/useWord'
+import { useWordStore } from '../words/hooks/use-word'
 
 export default function Home() {
 	const { isOpen, openSidebar, closeSidebar } = useCollapsableSidebarStore()

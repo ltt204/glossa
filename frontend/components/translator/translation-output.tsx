@@ -6,7 +6,7 @@ import { Button } from '../ui/button'
 import { Star } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Word } from '@/lib/words/models'
-import { useWordStore } from '@/app/(app)/words/hooks/useWord'
+import { useWordStore } from '@/app/(app)/words/hooks/use-word'
 
 export default function TranslationOutput({
 	isTranslating,

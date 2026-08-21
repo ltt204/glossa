@@ -1,12 +1,12 @@
 'use client'
 import { Languages } from 'lucide-react'
-import useTranslator from '@/app/(app)/translate/hooks/useTranslator'
 import LanguageSelectorBar from './translator/language-selector-bar'
 import SourceInput from './translator/source-input'
 import TranslationOutput from './translator/translation-output'
 import { useCollapsableSidebarStore } from '@/hooks/use-collapsable-sidebar'
 import DefinitionSidebarTitle from './translator/definition-sidebar-title'
 import DefinitionSidebarContent from './translator/definition-sidebar-content'
+import { useTranslateStore } from '@/app/(app)/translate/hooks/use-translator'
 
 export function Translator() {
 	const { openSidebar } = useCollapsableSidebarStore()
@@ -18,6 +18,10 @@ export function Translator() {
 		wordMeanings,
 		phonetic,
 		sourceText,
+
+		isError,
+		error,
+
 		setSourceText,
 		targetLang,
 		setTargetLang,
@@ -27,7 +31,11 @@ export function Translator() {
 
 		handleClear,
 		handleSwap,
-	} = useTranslator()
+	} = useTranslateStore()
+
+	if (isError) {
+		return <div>{error?.message}</div>
+	}
 
 	return (
 		<div className="flex flex-col h-full">
