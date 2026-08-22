@@ -41,7 +41,7 @@ export const useWordStore = create<UseWordStoreProps>((set, get) => ({
 		set((prev) => ({ ...prev, isFetching: true }))
 		try {
 			const words = await getWords()
-			set((prev) => ({ ...prev, words }))
+			set((prev) => ({ ...prev, words, isError: false, error: null }))
 		} catch (error) {
 			set((prev) => ({ ...prev, isError: true, error: error as Error }))
 		} finally {

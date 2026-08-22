@@ -4,12 +4,20 @@ import SpeakButton from '../shared/speak-button'
 import { Button } from '../ui/button'
 import { Item, ItemActions, ItemContent, ItemDescription } from '../ui/item'
 import { useWordStore } from '@/app/(app)/words/hooks/use-word'
+import WordError from './error-component'
 
 export default function WordsList() {
-	const { words, handleUnsave, isFetching, isError, error } = useWordStore()
+	const { words, handleUnsave, isFetching, isError, error, init } =
+		useWordStore()
 
 	if (isError) {
-		return <div>Error: {error?.message}</div>
+		return (
+			<WordError
+				error={error!}
+				resetErrorBoundary={() => init()}
+				className="h-full"
+			/>
+		)
 	}
 
 	if (isFetching) {

@@ -1,11 +1,40 @@
+import { cn } from '@/lib/utils'
+import { Button } from '../ui/button'
+
 interface ErrorComponentProps {
-	error: Error
+	message: string
+	illustration?: React.ReactNode
+	subMessage?: string
+	buttonText?: string
+	className?: string
+	reset: () => void
 }
 
-export default function ErrorComponent({ error }: ErrorComponentProps) {
+export default function ErrorComponent({
+	message,
+	illustration,
+	subMessage,
+	buttonText,
+	className,
+	reset,
+}: ErrorComponentProps) {
 	return (
-		<div>
-			<h1>{error.message}</h1>
+		<div
+			className={cn(
+				'flex flex-col items-center justify-center gap-2',
+				className,
+			)}
+		>
+			{illustration}
+			<h1 className="text-lg font-heading font-semibold tracking-tight">
+				{message}
+			</h1>
+
+			{subMessage && (
+				<p className="text-sm text-muted-foreground">{subMessage}</p>
+			)}
+
+			{reset && buttonText && <Button onClick={reset}>{buttonText}</Button>}
 		</div>
 	)
 }

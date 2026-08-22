@@ -52,13 +52,9 @@ export default function CollapsableSidebar({
 					</div>
 
 					{/* Abstract Content */}
-					<ScrollArea className="flex-1 max-h-[calc(100vh-8rem)] px-4 py-2 w-full">
-						{contentPayload.contentComponent && (
-							<contentPayload.contentComponent
-								payload={contentPayload.payload}
-							/>
-						)}
-					</ScrollArea>
+					{contentPayload.contentComponent && (
+						<contentPayload.contentComponent payload={contentPayload.payload} />
+					)}
 				</div>
 			</aside>
 		</div>
