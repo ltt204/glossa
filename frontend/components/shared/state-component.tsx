@@ -1,23 +1,23 @@
 import { cn } from '@/lib/utils'
 import { Button } from '../ui/button'
 
-interface ErrorComponentProps {
+interface StateComponentProps {
 	message: string
 	illustration?: React.ReactNode
 	subMessage?: string
-	buttonText?: string
 	className?: string
-	reset: () => void
+	reset?: () => void
+	buttonTextContent?: string
 }
 
-export default function ErrorComponent({
+export default function StateComponent({
 	message,
 	illustration,
 	subMessage,
-	buttonText,
 	className,
 	reset,
-}: ErrorComponentProps) {
+	buttonTextContent,
+}: StateComponentProps) {
 	return (
 		<div
 			className={cn(
@@ -34,7 +34,7 @@ export default function ErrorComponent({
 				<p className="text-sm text-muted-foreground">{subMessage}</p>
 			)}
 
-			{reset && buttonText && <Button onClick={reset}>{buttonText}</Button>}
+			{reset && <Button onClick={reset}>{buttonTextContent}</Button>}
 		</div>
 	)
 }

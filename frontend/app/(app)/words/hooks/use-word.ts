@@ -38,10 +38,10 @@ export const useWordStore = create<UseWordStoreProps>((set, get) => ({
 		get().words.find((word: Word) => word.origin === origin),
 	setWords: (words: Word[]) => set((prev) => ({ ...prev, words })),
 	init: async () => {
-		set((prev) => ({ ...prev, isFetching: true }))
+		set((prev) => ({ ...prev, isFetching: true, isError: false, error: null }))
 		try {
 			const words = await getWords()
-			set((prev) => ({ ...prev, words, isError: false, error: null }))
+			set((prev) => ({ ...prev, words }))
 		} catch (error) {
 			set((prev) => ({ ...prev, isError: true, error: error as Error }))
 		} finally {

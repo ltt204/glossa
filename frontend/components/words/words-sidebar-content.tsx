@@ -4,7 +4,8 @@ import SpeakButton from '../shared/speak-button'
 import { Button } from '../ui/button'
 import { Item, ItemActions, ItemContent, ItemDescription } from '../ui/item'
 import { useWordStore } from '@/app/(app)/words/hooks/use-word'
-import WordError from './error-component'
+import { Spinner } from '../ui/spinner'
+import StateComponent from '../shared/state-component'
 
 export default function WordsList() {
 	const { words, handleUnsave, isFetching, isError, error, init } =
@@ -12,20 +13,33 @@ export default function WordsList() {
 
 	if (isError) {
 		return (
-			<WordError
-				error={error!}
-				resetErrorBoundary={() => init()}
+			<StateComponent
 				className="h-full"
+				message="Oops, something went wrong!"
+				subMessage={error!.message}
+				buttonTextContent="Try again"
+				reset={() => init()}
 			/>
 		)
 	}
 
 	if (isFetching) {
-		return <div>Loading...</div>
+		return (
+			<StateComponent
+				className="h-full"
+				illustration={<Spinner className="size-8 text-primary" />}
+				message="Getting your saved words..."
+			/>
+		)
 	}
 
 	if (words.length === 0) {
-		return <div>No saved words</div>
+		return (
+			<StateComponent
+				className="h-full"
+				message="You haven't saved any words yet."
+			/>
+		)
 	}
 
 	return (

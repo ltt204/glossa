@@ -4,8 +4,6 @@ import './globals.css'
 import { cn } from '@/lib/utils'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { Toaster } from 'sonner'
-import GlobalError from './error'
-import { ErrorBoundary } from 'next/dist/client/components/error-boundary'
 
 const dmSans = DM_Sans({
 	subsets: ['latin'],
@@ -39,9 +37,7 @@ export default function RootLayout({
 			)}
 		>
 			<body className="min-h-full flex flex-col font-sans">
-				<TooltipProvider delayDuration={200}>
-					<ErrorBoundary errorComponent={GlobalError}>{children}</ErrorBoundary>
-				</TooltipProvider>
+				<TooltipProvider delayDuration={200}>{children} </TooltipProvider>
 				<Toaster />
 			</body>
 		</html>

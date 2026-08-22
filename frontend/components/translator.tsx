@@ -3,14 +3,9 @@ import { Languages } from 'lucide-react'
 import LanguageSelectorBar from './translator/language-selector-bar'
 import SourceInput from './translator/source-input'
 import TranslationOutput from './translator/translation-output'
-import { useCollapsableSidebarStore } from '@/hooks/use-collapsable-sidebar'
-import DefinitionSidebarTitle from './translator/definition-sidebar-title'
-import DefinitionSidebarContent from './translator/definition-sidebar-content'
 import { useTranslateStore } from '@/app/(app)/translate/hooks/use-translator'
 
 export function Translator() {
-	const { openSidebar } = useCollapsableSidebarStore()
-
 	const {
 		detectedLang,
 		targetLang,

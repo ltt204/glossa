@@ -1,4 +1,3 @@
-import ErrorComponent from '../shared/error-component'
 
 export default function WordError({
 	error,
@@ -10,7 +9,7 @@ export default function WordError({
 	className?: string
 }) {
 	return (
-		<ErrorComponent
+		<StateComponent
 			className={className}
 			message="Oops, something went wrong!"
 			subMessage={error.message}
