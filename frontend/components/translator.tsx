@@ -12,30 +12,15 @@ export function Translator() {
 	const { openSidebar } = useCollapsableSidebarStore()
 
 	const {
-		isTranslating,
-		translatedText,
 		detectedLang,
-		wordMeanings,
-		phonetic,
-		sourceText,
-
-		isError,
-		error,
-
-		setSourceText,
 		targetLang,
 		setTargetLang,
 
 		sourceLang,
 		setSourceLang,
 
-		handleClear,
 		handleSwap,
 	} = useTranslateStore()
-
-	if (isError) {
-		return <div>{error?.message}</div>
-	}
 
 	return (
 		<div className="flex flex-col h-full">
@@ -63,42 +48,9 @@ export function Translator() {
 
 			<div className="flex-1 flex flex-col md:flex-row gap-4">
 				{/* Source input */}
-				<SourceInput
-					sourceText={sourceText}
-					setSourceText={setSourceText}
-					phonetic={phonetic || ''}
-					isTranslating={isTranslating}
-					wordMeanings={wordMeanings}
-					charCount={sourceText.length}
-					handleClear={handleClear}
-					detectedLang={detectedLang}
-					sourceLang={sourceLang}
-					setSidebarOpen={() =>
-						openSidebar(
-							{
-								title: sourceText,
-								props: {
-									sourceLang,
-									detectedLang,
-									partOfSpeech: wordMeanings[0].partOfSpeech,
-								},
-								titleComponent: DefinitionSidebarTitle,
-							},
-							{
-								payload: wordMeanings,
-								contentComponent: DefinitionSidebarContent,
-							},
-						)
-					}
-				/>
+				<SourceInput />
 				{/* Translation output */}
-				<TranslationOutput
-					isTranslating={isTranslating}
-					sourceLang={sourceLang}
-					sourceText={sourceText}
-					translatedText={translatedText}
-					targetLang={targetLang}
-				/>
+				<TranslationOutput />
 			</div>
 
 			{/* Footer */}

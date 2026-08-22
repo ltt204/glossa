@@ -3,30 +3,44 @@ import TypingIndicator from '../shared/typing-indicator'
 import { Meaning } from '@/lib/translate/models'
 import SpeakButton from '../shared/speak-button'
 import ClearButton from '../shared/clear-button'
+import { useTranslateStore } from '@/app/(app)/translate/hooks/use-translator'
+import { useCollapsableSidebarStore } from '@/hooks/use-collapsable-sidebar'
+import DefinitionSidebarTitle from './definition-sidebar-title'
+import DefinitionSidebarContent from './definition-sidebar-content'
 
-export default function SourceInput({
-	sourceText,
-	setSourceText,
-	phonetic,
-	isTranslating,
-	wordMeanings,
-	charCount,
-	handleClear,
-	detectedLang,
-	sourceLang,
-	setSidebarOpen,
-}: {
-	sourceText: string
-	setSourceText: (text: string) => void
-	phonetic: string
-	isTranslating: boolean
-	wordMeanings: Meaning[]
-	charCount: number
-	handleClear: () => void
-	detectedLang: string
-	sourceLang: string
-	setSidebarOpen: () => void
-}) {
+export default function SourceInput() {
+	const {
+		sourceText,
+		setSourceText,
+		phonetic,
+		isTranslating,
+		wordMeanings,
+		handleClear,
+		detectedLang,
+		sourceLang,
+	} = useTranslateStore()
+
+	const { openSidebar } = useCollapsableSidebarStore()
+	const charCount = useTranslateStore((state) => state.sourceText.length)
+
+	const setSidebarOpen = () => {
+		openSidebar(
+			{
+				title: sourceText,
+				props: {
+					sourceLang,
+					detectedLang,
+					partOfSpeech: wordMeanings[0].partOfSpeech,
+				},
+				titleComponent: DefinitionSidebarTitle,
+			},
+			{
+				payload: wordMeanings,
+				contentComponent: DefinitionSidebarContent,
+			},
+		)
+	}
+
 	return (
 		<div className="flex-1 flex flex-col px-3 py-2 min-h-0 border-2 border-solid rounded-md mx-4">
 			<div className="relative flex-1">

@@ -7,22 +7,20 @@ import { Star } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Word } from '@/lib/words/models'
 import { useWordStore } from '@/app/(app)/words/hooks/use-word'
+import { useTranslateStore } from '@/app/(app)/translate/hooks/use-translator'
 
-export default function TranslationOutput({
-	isTranslating,
-	sourceLang,
-	sourceText,
-	translatedText,
-	targetLang,
-}: {
-	isTranslating: boolean
-	sourceLang: string
-	sourceText: string
-	translatedText: string
-	targetLang: string
-}) {
+export default function TranslationOutput() {
 	const { checkIsSaved, handleUnsave, handleSaveWord } = useWordStore()
 	const [savedWord, setSavedWord] = useState<Word>()
+	const {
+		isTranslating,
+		isError,
+		error,
+		sourceLang,
+		sourceText,
+		translatedText,
+		targetLang,
+	} = useTranslateStore()
 
 	useEffect(() => {
 		const savedWord = checkIsSaved(sourceText)
@@ -39,12 +37,16 @@ export default function TranslationOutput({
 				) : (
 					<div className="flex flex-row">
 						<Textarea
-							value={translatedText}
+							value={!isError ? translatedText : error?.message}
 							disabled
-							placeholder="Translation will appear here..."
-							className="disabled:opacity-100 disabled:cursor-default min-h-8 rounded-none resize-none border-none bg-transparent px-0 py-0 focus:outline-none text-[15px] leading-relaxed placeholder:text-muted-foreground/50 focus-visible:ring-0 focus-visible:border-transparent"
+							placeholder={
+								isError ? 'Error' : 'Translation will appear here...'
+							}
+							className={`${
+								isError ? 'text-red-400 font-semibold italic' : 'text-primary'
+							} disabled:opacity-100 disabled:cursor-default min-h-8 rounded-none resize-none border-none bg-transparent px-0 py-0 focus:outline-none text-[15px] leading-relaxed placeholder:text-muted-foreground/50 focus-visible:ring-0 focus-visible:border-transparent`}
 						/>
-						{translatedText && (
+						{!isError && (
 							<Button
 								variant="secondary"
 								onClick={async () => {
