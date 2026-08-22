@@ -68,8 +68,6 @@ export async function signup(
 		cache: 'no-store',
 	})
 
-	console.log('Signup Response: ', res)
-
 	if (!res.success || !res.content) {
 		return { message: res.message ?? 'Sign up failed.' }
 	}
@@ -115,8 +113,6 @@ async function setCredentialsCookie(
 		path: '/',
 		maxAge: 7 * 24 * 60 * 60,
 	})
-
-	console.log('Successfully set cookies!')
 }
 
 export async function logout() {

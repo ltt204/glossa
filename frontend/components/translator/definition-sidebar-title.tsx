@@ -14,8 +14,6 @@ export default function DefinitionSidebarTitle({
 	title,
 	props,
 }: DefinitionTitlePayloadProps) {
-	console.log('title', title)
-	console.log('props', JSON.stringify(props, null, 2))
 	return (
 		<div className="flex flex-col">
 			<div className="flex flex-row gap-2">

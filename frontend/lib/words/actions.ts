@@ -23,8 +23,6 @@ export async function saveWord(input: CreateWordInput): Promise<Word> {
 		body: JSON.stringify(input),
 	})
 
-	console.log('RES:', res)
-
 	if (!res.success || !res.content) {
 		throw new WordsApiError(res.message ?? 'Failed to save word')
 	}

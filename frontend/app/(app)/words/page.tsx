@@ -14,7 +14,6 @@ export default function WordsPage() {
 		})
 	}, [])
 
-	console.log('data:', words)
 	return (
 		<div className="p-4">
 			{words && words.length > 0 ? (

@@ -14,10 +14,7 @@ export default function Home() {
 	const { isOpen, openSidebar, closeSidebar } = useCollapsableSidebarStore()
 	const { words, init } = useWordStore()
 
-	console.log('words', words)
-
 	useEffect(() => {
-		console.log('init')
 		init()
 	}, [init])
 

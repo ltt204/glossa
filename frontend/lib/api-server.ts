@@ -3,7 +3,6 @@ import { cookies } from 'next/headers'
 import {
 	createServerResponseSchema,
 	RefreshTokenResponse,
-	RefreshTokenResponseSchema,
 	ServerResponse,
 } from './models'
 import z from 'zod'
@@ -31,19 +30,14 @@ export async function apiFetch<T>(
 	})
 
 	if (response.status === 401) {
-		console.log('Hit UNAUTHORIZED. Start to refresh the token...')
 		const tokens = await refreshAccessToken()
 
-		console.log('Refreshing response: ', tokens)
 		if (tokens) {
 			headers.set('Authorization', `Bearer ${tokens.accessToken}`)
-			console.log('Token refreshed successfully. Retry the request...')
 			return await handleServerResponse<T>(
 				await fetch(fullpath, { ...request, headers, cache: 'no-store' }),
 			)
 		}
-
-		console.log('Failed to refresh tokens')
 	}
 
 	return handleServerResponse<T>(response)
@@ -90,7 +84,6 @@ async function handleServerResponse<T>(
 		success: false,
 		message: 'Failed to fetch data.',
 	}
-	console.log('response: ', response)
 
 	if (!response.ok && response.status !== 204) {
 		const data = await response.json()

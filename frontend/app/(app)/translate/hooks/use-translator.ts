@@ -117,7 +117,6 @@ export const useTranslateStore = create<UseTranslateStoreProps>((set, get) => ({
 			})
 
 			if (!response.ok) {
-				console.log(`Resposne is not ok: ${response}`)
 				useTranslateStore.setState({ isTranslating: false })
 				throw new Error('Translation failed')
 			}

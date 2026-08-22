@@ -12,7 +12,6 @@ export default function SpeakButton({
 	detectedLang?: string
 }) {
 	const handleSpeak = (text: string, lang: string) => {
-		console.log(text, lang)
 		if (!text || !window.speechSynthesis) return
 		window.speechSynthesis.cancel()
 		const utterance = new SpeechSynthesisUtterance(text)

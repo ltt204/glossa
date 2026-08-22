@@ -12,7 +12,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 			signal: signal,
 		})
 
-		console.log(`ROUTE file system response: ${JSON.stringify(res)}\n`)
 		return NextResponse.json(res)
 	} catch (error: any) {
 		if (error === 'AbortSignal') {

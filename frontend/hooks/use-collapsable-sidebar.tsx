@@ -33,7 +33,6 @@ export const useCollapsableSidebarStore = create<CollapsableSidebarProps>(
 			titlePayload: TitlePayloadProps,
 			contentPayload: ContentPayloadProps,
 		) => {
-			console.log('openSidebar', titlePayload, contentPayload)
 			set({
 				isOpen: true,
 				titlePayload,
