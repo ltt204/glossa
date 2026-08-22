@@ -5,14 +5,10 @@ import {
 	TranslateResultSchema,
 } from '@/lib/translate/models'
 import { create } from 'zustand'
-import debounce from 'lodash.debounce'
-import { DebouncedFunc } from 'lodash-es'
+import { useQuery } from '@tanstack/react-query'
+import useDebounce from '@/app/hooks/use-debounce'
 
 type UseTranslateStoreProps = {
-	isTranslating: boolean
-	isError: boolean
-	error: Error | null
-
 	translatedResult: TranslateResult | null
 	translatedText: string
 	detectedLang: string
@@ -31,16 +27,9 @@ type UseTranslateStoreProps = {
 
 	handleSwap: () => void
 	handleClear: () => void
-	translate: DebouncedFunc<
-		(text: string, signal?: AbortSignal) => Promise<void>
-	>
 }
 
 export const useTranslateStore = create<UseTranslateStoreProps>((set, get) => ({
-	isTranslating: false,
-	isError: false,
-	error: null,
-
 	translatedResult: null,
 	translatedText: '',
 	detectedLang: '',
@@ -52,19 +41,16 @@ export const useTranslateStore = create<UseTranslateStoreProps>((set, get) => ({
 	sourceText: '',
 	setSourceText: (text: string) => {
 		set({ sourceText: text })
-		get().translate(text)
 	},
 
 	targetLang: 'vi',
 	setTargetLang: (lang: string) => {
 		set({ targetLang: lang })
-		get().translate(get().sourceText)
 	},
 
 	sourceLang: 'auto',
 	setSourceLang: (lang: string) => {
 		set({ sourceLang: lang })
-		get().translate(get().sourceText)
 	},
 
 	handleSwap: () => {
@@ -75,8 +61,6 @@ export const useTranslateStore = create<UseTranslateStoreProps>((set, get) => ({
 				sourceText: prev.translatedText,
 			}
 		})
-
-		get().translate(get().sourceText)
 	},
 	handleClear: () => {
 		set({
@@ -87,96 +71,76 @@ export const useTranslateStore = create<UseTranslateStoreProps>((set, get) => ({
 			phonetic: '',
 		})
 	},
-	translate: debounce(async (text: string): Promise<void> => {
-		if (get().abortController) {
-			get().abortController!.abort()
-		}
+}))
 
-		const controller = new AbortController()
+export function useTranslator() {
+	const { sourceText, sourceLang, targetLang } = useTranslateStore()
 
-		set({
-			abortController: controller,
-		})
-		const { signal } = controller
+	const debouncedSourceText = useDebounce(sourceText, 500)
 
-		if (text.trim() === '') {
-			useTranslateStore.setState({ isTranslating: false })
-			return
-		}
-
-		const fetchData = async () => {
-			useTranslateStore.setState({ isTranslating: true })
+	const { data, isLoading, isError, error } = useQuery({
+		queryKey: ['translate', debouncedSourceText, sourceLang, targetLang],
+		queryFn: async ({ signal }: { signal?: AbortSignal }) => {
 			const response = await fetch('/api/translate', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
-					text: text,
-					target: get().targetLang,
+					text: debouncedSourceText,
+					target: targetLang,
 				}),
 				signal,
 			})
-
-			if (!response.ok) {
-				useTranslateStore.setState({ isTranslating: false })
-				throw new Error('Translation failed')
-			}
 
 			const res = await response.json()
 			const parseResponse = TranslateResultSchema.safeParse(res.content)
 
 			const data = parseResponse.data
 			if (!data || data.translations.length === 0) {
-				useTranslateStore.setState({ isTranslating: false })
 				throw new Error('Translation not found')
 			}
 
-			set((prev) => ({
-				...prev,
-				isTranslating: false,
-				translatedResult: data,
-			}))
+			return data
+		},
+		enabled: !!debouncedSourceText && debouncedSourceText.trim() !== '',
+	})
+
+	if (!data) {
+		return {
+			isError,
+			isLoading,
+			error,
+
+			wordMeanings: [],
+			phonetic: '',
+			detectedLang: '',
+			translatedText: '',
 		}
+	}
 
-		await fetchData().catch((err) => {
-			if (err.name !== 'AbortError') {
-				set((prev) => ({
-					...prev,
-					isError: true,
-					error: err,
-					isTranslating: false,
-				}))
-			}
-		})
+	const translatedText =
+		data.translations
+			?.map((translation: Translate) => {
+				return translation.translatedText
+			})
+			.join(', ') || ''
 
-		if (!get().translatedResult) {
-			console.error('No translated result found')
-			return
-		}
+	const detectedLang = data.translations?.[0]?.detectedLanguageCode
 
-		const translatedResult = get().translatedResult!
+	const firstDefinition = data.definitions?.[0]
+	const wordMeanings = firstDefinition?.meanings || []
 
-		set({
-			translatedText:
-				translatedResult.translations
-					.map((translation: Translate) => {
-						return translation.translatedText
-					})
-					.join(', ') || '',
-		})
+	const phonetic =
+		firstDefinition?.phonetics.filter((phonetic) => phonetic.text !== '')[0]
+			?.text || ''
 
-		set({
-			detectedLang: translatedResult.translations[0].detectedLanguageCode,
-		})
+	return {
+		isError,
+		isLoading,
+		error,
 
-		const firstDefinition = translatedResult.definitions[0]
-		set({
-			wordMeanings: firstDefinition?.meanings || [],
-		})
-
-		set({
-			phonetic:
-				firstDefinition?.phonetics.filter((phonetic) => phonetic.text !== '')[0]
-					?.text || '',
-		})
-	}, 500),
-}))
+		wordMeanings,
+		phonetic,
+		detectedLang,
+		translatedText,
+	}
+}

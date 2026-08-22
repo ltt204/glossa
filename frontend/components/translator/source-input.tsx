@@ -1,27 +1,38 @@
 import { Textarea } from '@/components/ui/textarea'
 import TypingIndicator from '../shared/typing-indicator'
-import { Meaning } from '@/lib/translate/models'
 import SpeakButton from '../shared/speak-button'
 import ClearButton from '../shared/clear-button'
-import { useTranslateStore } from '@/app/(app)/translate/hooks/use-translator'
+import {
+	useTranslator,
+	useTranslateStore,
+} from '@/app/(app)/translate/hooks/use-translator'
 import { useCollapsableSidebarStore } from '@/hooks/use-collapsable-sidebar'
 import DefinitionSidebarTitle from './definition-sidebar-title'
 import DefinitionSidebarContent from './definition-sidebar-content'
+import StateComponent from '../shared/state-component'
 
 export default function SourceInput() {
 	const {
 		sourceText,
 		setSourceText,
-		phonetic,
-		isTranslating,
-		wordMeanings,
-		handleClear,
-		detectedLang,
 		sourceLang,
+
+		handleClear,
 	} = useTranslateStore()
 
+	const { isError, isLoading, error, wordMeanings, phonetic, detectedLang } =
+		useTranslator()
+
+	if (isError) {
+		return (
+			<StateComponent
+				message={error?.message ?? 'Error occurred while fetching data'}
+			/>
+		)
+	}
+
 	const { openSidebar } = useCollapsableSidebarStore()
-	const charCount = useTranslateStore((state) => state.sourceText.length)
+	const charCount = sourceText.length
 
 	const setSidebarOpen = () => {
 		openSidebar(
@@ -56,7 +67,7 @@ export default function SourceInput() {
 					</p>
 				)}
 
-				{isTranslating ? (
+				{isLoading ? (
 					<TypingIndicator />
 				) : sourceText.trim() !== '' && wordMeanings?.length !== 0 ? (
 					<div className="flex flex-row gap-2">

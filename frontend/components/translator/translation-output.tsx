@@ -7,20 +7,16 @@ import { Star } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Word } from '@/lib/words/models'
 import { useWordStore } from '@/app/(app)/words/hooks/use-word'
-import { useTranslateStore } from '@/app/(app)/translate/hooks/use-translator'
+import {
+	useTranslateStore,
+	useTranslator,
+} from '@/app/(app)/translate/hooks/use-translator'
 
 export default function TranslationOutput() {
 	const { checkIsSaved, handleUnsave, handleSaveWord } = useWordStore()
 	const [savedWord, setSavedWord] = useState<Word>()
-	const {
-		isTranslating,
-		isError,
-		error,
-		sourceLang,
-		sourceText,
-		translatedText,
-		targetLang,
-	} = useTranslateStore()
+	const { sourceText, sourceLang, targetLang } = useTranslateStore()
+	const { isError, isLoading, error, translatedText } = useTranslator()
 
 	useEffect(() => {
 		const savedWord = checkIsSaved(sourceText)
@@ -32,7 +28,7 @@ export default function TranslationOutput() {
 	return (
 		<div className="flex-1 flex flex-col px-3 py-2 min-h-0 rounded-md border-2 border-solid mx-4">
 			<div className="flex-1">
-				{sourceText.trim() !== '' && isTranslating ? (
+				{sourceText.trim() !== '' && isLoading ? (
 					<TypingIndicator />
 				) : (
 					<div className="flex flex-row">

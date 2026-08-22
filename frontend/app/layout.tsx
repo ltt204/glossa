@@ -2,8 +2,9 @@ import type { Metadata } from 'next'
 import { DM_Sans, Space_Grotesk } from 'next/font/google'
 import './globals.css'
 import { cn } from '@/lib/utils'
-import { TooltipProvider } from '@/components/ui/tooltip'
 import { Toaster } from 'sonner'
+import Providers from './providers'
+import { TooltipProvider } from '@/components/ui/tooltip'
 
 const dmSans = DM_Sans({
 	subsets: ['latin'],
@@ -37,7 +38,9 @@ export default function RootLayout({
 			)}
 		>
 			<body className="min-h-full flex flex-col font-sans">
-				<TooltipProvider delayDuration={200}>{children} </TooltipProvider>
+				<TooltipProvider delayDuration={200}>
+					<Providers>{children}</Providers>
+				</TooltipProvider>
 				<Toaster />
 			</body>
 		</html>
