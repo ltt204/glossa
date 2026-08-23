@@ -3,10 +3,10 @@ import {
 	Translate,
 	TranslateResult,
 	TranslateResultSchema,
-} from '@/lib/translate/models'
+} from '../../lib/translate/models'
 import { create } from 'zustand'
 import { useQuery } from '@tanstack/react-query'
-import useDebounce from '@/hooks/use-debounce'
+import useDebounce from '../shared/use-debounce'
 
 type UseTranslateStoreProps = {
 	translatedResult: TranslateResult | null

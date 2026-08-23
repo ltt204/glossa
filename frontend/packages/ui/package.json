@@ -1,7 +1,28 @@
 {
   "name": "@glossa/ui",
-  "main": "./src/index.tsx",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
   "exports": {
-    ".": "./src/index.tsx"
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "generate-exports": "barrelsby --delete -d ./src/components"
+  },
+  "dependencies": {
+    "@glossa/core": "workspace:*",
+    "clsx": "^2.1.1",
+    "lucide-react": "^1.33.0",
+    "next": "16.2.3",
+    "tailwind-merge": "^2.5.2"
+  },
+  "peerDependencies": {
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "devDependencies": {
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "barrelsby": "^2.8.1",
+    "typescript": "^5.0.0"
   }
 }
