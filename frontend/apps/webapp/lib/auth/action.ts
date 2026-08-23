@@ -34,8 +34,6 @@ export async function signin(
 		return { message: res.message ?? 'Sign in failed.' }
 	}
 
-	console.log(res.content)
-
 	const { accessToken, refreshToken } = res.content
 	if (!accessToken || !refreshToken) {
 		return { message: 'Sign in Failed.' }

@@ -32,7 +32,7 @@ declare global {
   export type { Browser } from 'wxt/browser'
   import('wxt/browser')
   // @ts-ignore
-  export type { StorageArea, WxtStorage, WxtStorageItem, StorageItemKey, StorageAreaChanges, MigrationError } from 'wxt/utils/storage'
+  export type { WxtStorage, WxtStorageItem, StorageArea, StorageItemKey, StorageAreaChanges, MigrationError } from 'wxt/utils/storage'
   import('wxt/utils/storage')
   // @ts-ignore
   export type { WxtWindowEventMap } from 'wxt/utils/content-script-context'

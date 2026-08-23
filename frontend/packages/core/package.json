@@ -1,0 +1,7 @@
+{
+  "name": "@glossa/core",
+  "main": "./src/index.tsx",
+  "exports": {
+    ".": "./src/index.tsx"
+  }
+}
