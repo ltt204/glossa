@@ -10,7 +10,7 @@ interface StateComponentProps {
 	buttonTextContent?: string
 }
 
-export default function StateComponent({
+export function StateComponent({
 	message,
 	illustration,
 	subMessage,

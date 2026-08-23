@@ -1,13 +1,13 @@
 import { Badge } from '../ui/badge'
 import { ArrowRight, Star } from 'lucide-react'
-import SpeakButton from '../shared/speak-button'
+import { SpeakButton } from '../shared/speak-button'
 import { Button } from '../ui/button'
 import { Item, ItemActions, ItemContent, ItemDescription } from '../ui/item'
 import { useWordStore } from '@glossa/core'
 import { Spinner } from '../ui/spinner'
-import StateComponent from '../shared/state-component'
+import { StateComponent } from '../shared/state-component'
 
-export default function WordsList() {
+export function WordsList() {
 	const { words, handleUnsave, isFetching, isError, error, init } =
 		useWordStore()
 

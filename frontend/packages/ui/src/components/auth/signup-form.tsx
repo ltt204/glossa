@@ -1,6 +1,6 @@
 'use client'
 
-import { SignUpState, signup } from '@/lib/auth/actions'
+import { SignUpState, signup } from '@glossa/core'
 import { useActionState } from 'react'
 import { Label } from '../ui/label'
 import { Input } from '../ui/input'
@@ -10,7 +10,7 @@ import Link from 'next/link'
 
 const initialState: SignUpState = { message: '' }
 
-export default function SignUpForm() {
+export function SignUpForm() {
 	const [state, action, pending] = useActionState(signup, initialState)
 
 	return (

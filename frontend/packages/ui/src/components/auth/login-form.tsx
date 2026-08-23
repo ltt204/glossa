@@ -1,6 +1,6 @@
 'use client'
 
-import { LoginState, signin } from '@glossa/core/lib/auth/actions'
+import { LoginState, signin } from '@glossa/core'
 import { useActionState } from 'react'
 import { Label } from '../ui/label'
 import { Input } from '../ui/input'
@@ -9,7 +9,7 @@ import { Separator } from '../ui/separator'
 
 const initialState: LoginState = { isSuccess: true, message: '' }
 
-export default function LoginForm() {
+export function LoginForm() {
 	const [state, formAction, pending] = useActionState(signin, initialState)
 
 	return (

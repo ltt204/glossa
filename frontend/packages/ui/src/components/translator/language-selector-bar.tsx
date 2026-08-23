@@ -24,7 +24,7 @@ const LANGUAGES = [
 	{ code: 'ar', name: 'Arabic', flag: 'AR' },
 ] as const
 
-export default function LanguageSelectorBar({
+export function LanguageSelectorBar({
 	sourceLang,
 	setSourceLang,
 	targetLang,
@@ -86,7 +86,7 @@ export default function LanguageSelectorBar({
 
 			<Select
 				value={targetLang}
-				onValueChange={(newLang) => setTargetLang(newLang)}
+				onValueChange={(newLang: string) => setTargetLang(newLang)}
 			>
 				<SelectTrigger className="flex-1 h-9 text-xs font-medium">
 					<SelectValue />

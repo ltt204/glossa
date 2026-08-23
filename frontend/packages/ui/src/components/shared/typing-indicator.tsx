@@ -1,4 +1,4 @@
-export default function TypingIndicator() {
+export function TypingIndicator() {
 	return (
 		<div className="flex items-center gap-1.5 items-smart">
 			<span

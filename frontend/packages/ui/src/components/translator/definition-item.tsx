@@ -1,8 +1,8 @@
-import { Definition } from '@/lib/translate/models'
+import type { Definition } from '@glossa/core'
 import { Field, FieldContent, FieldDescription, FieldTitle } from '../ui/field'
 import { Badge } from '../ui/badge'
 
-export default function DefinitionItem({
+export function DefinitionItem({
 	partOfSpeech,
 	definition,
 }: {

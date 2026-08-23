@@ -1,10 +1,9 @@
 import type { Metadata } from 'next'
 import { DM_Sans, Space_Grotesk } from 'next/font/google'
 import './globals.css'
-import { cn } from '@/lib/utils'
 import { Toaster } from 'sonner'
 import Providers from './providers'
-import { TooltipProvider } from '@/components/ui/tooltip'
+import { TooltipProvider, cn } from '@glossa/ui'
 
 const dmSans = DM_Sans({
 	subsets: ['latin'],

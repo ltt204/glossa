@@ -1,5 +1,4 @@
-import SignUpForm from '@/components/auth/signup-form'
-import AuthLayout from '@/components/auth/auth-layout'
+import { AuthLayout, SignUpForm } from '@glossa/ui'
 
 export default function SignupPage() {
 	return (

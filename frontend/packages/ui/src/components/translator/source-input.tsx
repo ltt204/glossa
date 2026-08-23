@@ -1,17 +1,17 @@
 import { Textarea } from '../ui/textarea'
-import TypingIndicator from '../shared/typing-indicator'
-import SpeakButton from '../shared/speak-button'
-import ClearButton from '../shared/clear-button'
+import { TypingIndicator } from '../shared/typing-indicator'
+import { SpeakButton } from '../shared/speak-button'
+import { ClearButton } from '../shared/clear-button'
 import {
+	useCollapsableSidebarStore,
 	useTranslator,
 	useTranslateStore,
-} from '@/app/(app)/translate/hooks/use-translator'
-import { useCollapsableSidebarStore } from '@/hooks/use-collapsable-sidebar'
-import DefinitionSidebarTitle from './definition-sidebar-title'
-import DefinitionSidebarContent from './definition-sidebar-content'
-import StateComponent from '../shared/state-component'
+} from '@glossa/core'
+import { DefinitionSidebarTitle } from './definition-sidebar-title'
+import { DefinitionSidebarContent } from './definition-sidebar-content'
+import { StateComponent } from '../shared/state-component'
 
-export default function SourceInput() {
+export function SourceInput() {
 	const {
 		sourceText,
 		setSourceText,

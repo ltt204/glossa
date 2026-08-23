@@ -3,7 +3,7 @@ import { Button } from '../ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip'
 import { Copy, Check } from 'lucide-react'
 
-export default function CopyButton({ textToCopy }: { textToCopy: string }) {
+export function CopyButton({ textToCopy }: { textToCopy: string }) {
 	const [copied, setCopied] = useState(false)
 
 	const handleCopy = async () => {

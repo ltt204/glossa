@@ -1,6 +1,6 @@
 import { Languages } from 'lucide-react'
 
-export default function AuthLayout({
+export function AuthLayout({
 	children,
 }: Readonly<{
 	children: React.ReactNode

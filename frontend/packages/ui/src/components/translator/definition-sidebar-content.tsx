@@ -1,10 +1,7 @@
-import { Definition, Meaning } from '@/lib/translate/models'
-import DefinitionItem from './definition-item'
-import { ContentPayloadProps } from '@/hooks/use-collapsable-sidebar'
+import type { Definition, Meaning, ContentPayloadProps } from '@glossa/core'
+import { DefinitionItem } from './definition-item'
 
-export default function DefinitionSidebarContent({
-	payload,
-}: ContentPayloadProps) {
+export function DefinitionSidebarContent({ payload }: ContentPayloadProps) {
 	return (
 		<div>
 			{payload!.map((meaning: Meaning, index: number) => (

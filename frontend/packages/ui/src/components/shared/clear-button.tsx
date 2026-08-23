@@ -2,7 +2,7 @@ import { Eraser } from 'lucide-react'
 import { Button } from '../ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip'
 
-export default function ClearButton({
+export function ClearButton({
 	sourceText,
 	handleClear,
 }: {

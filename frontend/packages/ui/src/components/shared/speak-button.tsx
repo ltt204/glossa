@@ -2,7 +2,7 @@ import { Volume2 } from 'lucide-react'
 import { Button } from '../ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip'
 
-export default function SpeakButton({
+export function SpeakButton({
 	sourceText,
 	sourceLang,
 	detectedLang,

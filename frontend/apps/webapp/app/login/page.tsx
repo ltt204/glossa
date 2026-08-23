@@ -1,5 +1,4 @@
-import { LoginForm } from '@/components/auth/login-form'
-import AuthLayout from '@/components/auth/auth-layout'
+import { AuthLayout, LoginForm } from '@glossa/ui'
 
 export default function LoginPage() {
 	return (

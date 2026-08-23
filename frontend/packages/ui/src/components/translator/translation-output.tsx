@@ -1,18 +1,18 @@
-import TypingIndicator from '../shared/typing-indicator'
+import { TypingIndicator } from '../shared/typing-indicator'
 import { Textarea } from '../ui/textarea'
-import SpeakButton from '../shared/speak-button'
-import CopyButton from '../shared/copy-button'
+import { SpeakButton } from '../shared/speak-button'
+import { CopyButton } from '../shared/copy-button'
 import { Button } from '../ui/button'
 import { Star } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { Word } from '@/lib/words/models'
-import { useWordStore } from '@/app/(app)/words/hooks/use-word'
 import {
+	Word,
+	useWordStore,
 	useTranslateStore,
 	useTranslator,
-} from '@/app/(app)/translate/hooks/use-translator'
+} from '@glossa/core'
 
-export default function TranslationOutput() {
+export function TranslationOutput() {
 	const { checkIsSaved, handleUnsave, handleSaveWord } = useWordStore()
 	const [savedWord, setSavedWord] = useState<Word>()
 	const { sourceText, sourceLang, targetLang } = useTranslateStore()

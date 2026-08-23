@@ -1,6 +1,5 @@
-import { TitlePayloadProps } from '@/hooks/use-collapsable-sidebar'
-import SpeakButton from '../shared/speak-button'
-import { DrawerDescription } from '../ui/drawer'
+import type { TitlePayloadProps } from '@glossa/core'
+import { SpeakButton } from '../shared/speak-button'
 
 export interface DefinitionTitlePayloadProps extends TitlePayloadProps {
 	props: {
@@ -10,7 +9,7 @@ export interface DefinitionTitlePayloadProps extends TitlePayloadProps {
 	}
 }
 
-export default function DefinitionSidebarTitle({
+export function DefinitionSidebarTitle({
 	title,
 	props,
 }: DefinitionTitlePayloadProps) {
