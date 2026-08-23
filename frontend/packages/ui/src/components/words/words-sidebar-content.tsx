@@ -3,7 +3,7 @@ import { ArrowRight, Star } from 'lucide-react'
 import SpeakButton from '../shared/speak-button'
 import { Button } from '../ui/button'
 import { Item, ItemActions, ItemContent, ItemDescription } from '../ui/item'
-import { useWordStore } from '@/app/(app)/words/hooks/use-word'
+import { useWordStore } from '@glossa/core'
 import { Spinner } from '../ui/spinner'
 import StateComponent from '../shared/state-component'
 

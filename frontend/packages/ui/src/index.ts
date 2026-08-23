@@ -1,2 +1,5 @@
-export * from './components/ui'
+export * from './components/navigation'
 export * from './components/shared'
+export * from './components/translator'
+export * from './components/ui'
+export * from './components/words'

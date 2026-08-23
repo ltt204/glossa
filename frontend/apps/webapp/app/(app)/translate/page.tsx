@@ -1,18 +1,20 @@
 'use client'
 
-import { Translator } from '@/components/translator'
-import CollapsableSidebar from '@/components/shared/collapsable-sidebar'
-import { useCollapsableSidebarStore } from '@/hooks/use-collapsable-sidebar'
-import { Button } from '@/components/ui/button'
 import { Star } from 'lucide-react'
-import WordsList from '@/components/words/words-sidebar-content'
-import WordsSidebarTitle from '@/components/words/words-sidebar-title'
 import { useEffect } from 'react'
-import { useWordStore } from '../words/hooks/use-word'
+import { useWordStore } from '@glossa/core'
+import {
+	Button,
+	Translator,
+	WordsList,
+	WordsSidebarTitle,
+	CollapsableSidebar,
+} from '@glossa/ui'
+import { useCollapsableSidebarStore } from '@/hooks/use-collapsable-sidebar'
 
 export default function Home() {
 	const { isOpen, openSidebar, closeSidebar } = useCollapsableSidebarStore()
-	const { words, init } = useWordStore()
+	const { init } = useWordStore()
 
 	useEffect(() => {
 		init()

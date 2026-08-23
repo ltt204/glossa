@@ -8,5 +8,4 @@ export * from "./auth/index";
 export * from "./shared/index";
 export * from "./translator/index";
 export * from "./ui/index";
-export * from "./words/words-sidebar-content";
-export * from "./words/words-sidebar-title";
+export * from "./words/index";

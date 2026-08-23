@@ -1,5 +1,5 @@
-import { getWords, saveWord, unsaveWord } from '@/lib/words/actions'
-import { CreateWordInput, Word } from '@/lib/words/models'
+import { getWords, saveWord, unsaveWord } from '../../lib/words/actions'
+import { CreateWordInput, Word } from '../../lib/words/models'
 import { create } from 'zustand'
 
 type UseWordStoreProps = {
