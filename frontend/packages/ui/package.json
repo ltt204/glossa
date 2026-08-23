@@ -6,7 +6,7 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "generate-exports": "barrelsby --delete -d ./src/components"
+    "generate-exports": "barrelsby --delete -d ./src -l all -E"
   },
   "dependencies": {
     "@glossa/core": "workspace:*",

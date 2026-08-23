@@ -9,7 +9,7 @@ import { Separator } from '../ui/separator'
 
 const initialState: LoginState = { isSuccess: true, message: '' }
 
-export function LoginForm() {
+export default function LoginForm() {
 	const [state, formAction, pending] = useActionState(signin, initialState)
 
 	return (
