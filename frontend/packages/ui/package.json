@@ -9,6 +9,10 @@
     "generate-exports": "barrelsby --delete -d ./src -l all"
   },
   "dependencies": {
+    "vaul": "^1.1.2",
+    "next-themes": "^0.4.6",
+    "server-only": "^0.0.1",
+    "sonner": "^2.0.8",
     "@glossa/core": "workspace:*",
     "clsx": "^2.1.1",
     "lucide-react": "^1.33.0",

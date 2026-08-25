@@ -1,4 +1,4 @@
-import { Navigation } from '@/components/navigation'
+import { Navigation } from '@glossa/ui'
 
 export default function RootLayout({
 	children,

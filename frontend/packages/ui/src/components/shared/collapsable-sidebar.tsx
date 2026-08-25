@@ -8,7 +8,7 @@ interface CollapsibleSidebarProps {
 	width?: number // Configurable width, defaults to 360
 }
 
-export default function CollapsableSidebar({
+export function CollapsableSidebar({
 	isOpen,
 	onClose,
 	width = 360,

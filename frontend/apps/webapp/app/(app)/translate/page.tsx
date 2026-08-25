@@ -2,7 +2,6 @@
 
 import { Star } from 'lucide-react'
 import { useEffect } from 'react'
-import { useWordStore } from '@glossa/core'
 import {
 	Button,
 	Translator,
@@ -10,7 +9,7 @@ import {
 	WordsSidebarTitle,
 	CollapsableSidebar,
 } from '@glossa/ui'
-import { useCollapsableSidebarStore } from '@/hooks/use-collapsable-sidebar'
+import { useCollapsableSidebarStore, useWordStore } from '@/app/hooks'
 
 export default function Home() {
 	const { isOpen, openSidebar, closeSidebar } = useCollapsableSidebarStore()

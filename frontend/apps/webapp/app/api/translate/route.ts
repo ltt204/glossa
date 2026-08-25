@@ -1,5 +1,5 @@
-import { apiFetch } from '@/lib/api-server'
 import { NextRequest, NextResponse } from 'next/server'
+import { apiFetch } from '../../lib/api-server'
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
 	try {
