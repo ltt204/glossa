@@ -1,6 +1,6 @@
-import { Button } from '../ui/button'
+import { useCollapsableSidebarStore } from '@/app/hooks'
+import { Button } from '@glossa/ui'
 import { X } from 'lucide-react'
-import { useCollapsableSidebarStore } from '@glossa/core'
 
 interface CollapsibleSidebarProps {
 	isOpen: boolean

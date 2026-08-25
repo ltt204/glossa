@@ -1,3 +1,5 @@
+'use client'
+
 import {
 	Button,
 	CopyButton,
@@ -40,32 +42,33 @@ export function TranslationOutput() {
 								isError ? 'text-red-400 font-semibold italic' : 'text-primary'
 							} disabled:opacity-100 disabled:cursor-default min-h-8 rounded-none resize-none border-none bg-transparent px-0 py-0 focus:outline-none text-[15px] leading-relaxed placeholder:text-muted-foreground/50 focus-visible:ring-0 focus-visible:border-transparent`}
 						/>
-						{!isError && (
-							<Button
-								variant="secondary"
-								onClick={async () => {
-									if (savedWord) {
-										handleUnsave(savedWord.id)
-										setSavedWord(undefined)
-									} else {
-										setSavedWord(
-											await handleSaveWord({
-												origin: sourceText,
-												source: sourceLang,
-												translated: translatedText,
-												target: targetLang,
-											}),
-										)
-									}
-								}}
-								className="h-8 w-8 rounded-full bg-transparent hover:bg-primary/10 hover:cursor-pointer"
-							>
-								<Star
-									fill={`${savedWord ? 'gold' : 'none'}`}
-									className={`w-4 h-4 cursor-pointer ${savedWord ? 'text-transparent' : 'text-gray-400'}`}
-								/>
-							</Button>
-						)}
+						{!isError ||
+							(sourceText.trim() !== '' && (
+								<Button
+									variant="secondary"
+									onClick={async () => {
+										if (savedWord) {
+											handleUnsave(savedWord.id)
+											setSavedWord(undefined)
+										} else {
+											setSavedWord(
+												await handleSaveWord({
+													origin: sourceText,
+													source: sourceLang,
+													translated: translatedText,
+													target: targetLang,
+												}),
+											)
+										}
+									}}
+									className="p-2 h-8 w-8 rounded-full bg-transparent hover:bg-primary/10 hover:cursor-pointer"
+								>
+									<Star
+										fill={`${savedWord ? 'gold' : 'none'}`}
+										className={`w-4 h-4 cursor-pointer ${savedWord ? 'text-transparent' : 'text-gray-400'}`}
+									/>
+								</Button>
+							))}
 					</div>
 				)}
 			</div>

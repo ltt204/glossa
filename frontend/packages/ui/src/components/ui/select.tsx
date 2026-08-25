@@ -122,12 +122,14 @@ function SelectItem({
 			)}
 			{...props}
 		>
+			<SelectPrimitive.ItemText className="ml-auto">
+				{children}
+			</SelectPrimitive.ItemText>
 			<span className="pointer-events-none absolute right-2 flex size-4 items-center justify-center">
 				<SelectPrimitive.ItemIndicator>
 					<CheckIcon className="pointer-events-none" />
 				</SelectPrimitive.ItemIndicator>
 			</span>
-			<SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
 		</SelectPrimitive.Item>
 	)
 }

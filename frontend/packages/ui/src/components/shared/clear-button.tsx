@@ -1,3 +1,5 @@
+'use client'
+
 import { Eraser } from 'lucide-react'
 import { Button } from '../ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip'
@@ -17,7 +19,7 @@ export function ClearButton({
 					size="icon-xs"
 					onClick={handleClear}
 					disabled={!sourceText}
-					className=" text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+					className="border-none text-muted-foreground hover:text-destructive hover:bg-destructive/10"
 				>
 					<Eraser className="w-3.5 h-3.5" />
 				</Button>

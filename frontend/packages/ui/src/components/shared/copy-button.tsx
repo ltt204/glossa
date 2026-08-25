@@ -1,3 +1,5 @@
+'use client'
+
 import { useState } from 'react'
 import { Button } from '../ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip'
@@ -22,7 +24,7 @@ export function CopyButton({ textToCopy }: { textToCopy: string }) {
 					size="icon-xs"
 					onClick={handleCopy}
 					disabled={!textToCopy}
-					className=" text-muted-foreground hover:text-primary hover:bg-primary/10"
+					className="text-muted-foreground hover:text-primary hover:bg-primary/10"
 				>
 					{copied ? (
 						<Check className="w-3.5 h-3.5 text-primary" />

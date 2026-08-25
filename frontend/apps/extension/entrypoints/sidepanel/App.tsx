@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { setOnUnauthorized } from './lib/api';
 import { getTokens } from './lib/storage';
-import LoginView from './views/LoginView';
+import LoginView from './views/login-view';
 import TranslatorView from './views/TranslatorView';
 
 export default function App() {

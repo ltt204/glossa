@@ -3,7 +3,6 @@
  */
 
 export * from "./clear-button";
-export * from "./collapsable-sidebar";
 export * from "./copy-button";
 export * from "./speak-button";
 export * from "./state-component";

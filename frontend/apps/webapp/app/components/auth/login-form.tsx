@@ -4,7 +4,10 @@ import { useActionState } from 'react'
 import { Label, Input, Button, Separator } from '@glossa/ui'
 import { LoginState, signin } from '@/app/lib/auth/actions'
 
-const initialState = new LoginState()
+const initialState: LoginState = {
+	isSuccess: false,
+	message: '',
+}
 
 export function LoginForm() {
 	const [state, formAction, pending] = useActionState(signin, initialState)

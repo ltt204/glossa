@@ -1,8 +1,7 @@
-import { Meaning, Translate, TranslateResult } from '@glossa/core'
+import { Meaning, Translate, TranslateResult, useDebounce } from '@glossa/core'
 import { TranslateResultSchema } from '@glossa/core'
 import { create } from 'zustand'
 import { useQuery } from '@tanstack/react-query'
-import useDebounce from '../../../../../packages/core/src/hooks/use-debounce'
 
 type UseTranslateStoreProps = {
 	translatedResult: TranslateResult | null

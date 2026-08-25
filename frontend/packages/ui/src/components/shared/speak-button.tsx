@@ -1,3 +1,4 @@
+'use client'
 import { Volume2 } from 'lucide-react'
 import { Button } from '../ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip'
@@ -33,7 +34,7 @@ export function SpeakButton({
 						)
 					}
 					disabled={!sourceText}
-					className="text-muted-foreground hover:text-primary hover:bg-primary/10"
+					className="border-none text-muted-foreground hover:text-primary hover:bg-primary/10"
 				>
 					<Volume2 className="w-3.5 h-3.5" />
 				</Button>

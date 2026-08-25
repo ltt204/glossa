@@ -50,7 +50,7 @@ export function LanguageSelectorBar({
 				value={sourceLang}
 				onValueChange={(newLang) => setSourceLang(newLang)}
 			>
-				<SelectTrigger className="flex-1 h-9 text-xs font-medium">
+				<SelectTrigger className="rounded-md flex-1 h-9 text-xs font-medium">
 					<SelectValue />
 				</SelectTrigger>
 				<SelectContent>
@@ -62,7 +62,7 @@ export function LanguageSelectorBar({
 					</SelectItem>
 					{LANGUAGES.map((lang) => (
 						<SelectItem key={lang.code} value={lang.code}>
-							<span className="mr-1.5 text-[10px] font-semibold text-muted-foreground/70">
+							<span className="mr-1.5 text-[10px] text-muted-foreground/70">
 								{lang.flag}
 							</span>
 							{lang.name}
@@ -90,13 +90,13 @@ export function LanguageSelectorBar({
 				value={targetLang}
 				onValueChange={(newLang: string) => setTargetLang(newLang)}
 			>
-				<SelectTrigger className="flex-1 h-9 text-xs font-medium">
+				<SelectTrigger className="rounded-md flex-1 h-9 text-xs font-medium">
 					<SelectValue />
 				</SelectTrigger>
-				<SelectContent>
+				<SelectContent className="rounded-md bg-background">
 					{LANGUAGES.map((lang) => (
 						<SelectItem key={lang.code} value={lang.code}>
-							<span className="mr-1.5 text-[10px] font-semibold text-muted-foreground/70">
+							<span className="mr-1.5 text-[10px] text-muted-foreground/70">
 								{lang.flag}
 							</span>
 							{lang.name}

@@ -5,13 +5,9 @@ import { redirect } from 'next/navigation'
 import { apiFetch } from '@/app/lib/api-server'
 import { SignInResponse, SignUpResponse } from '@glossa/core'
 
-export class LoginState {
+export interface LoginState {
 	isSuccess: boolean
 	message: string
-	constructor() {
-		this.isSuccess = false
-		this.message = ''
-	}
 }
 
 export async function signin(
