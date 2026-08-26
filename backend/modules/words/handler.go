@@ -41,7 +41,8 @@ func (h *WordsHandler) handleSaveWord(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, responsedto.ErrorResponse(apperror.ErrBadJsonStructure))
 		return
 	}
-	result, err := h.wordSvc.Save(ctx, req.ToWord())
+	currentUserId := ctx.Value("user_id").(string)
+	result, err := h.wordSvc.Save(ctx, req.ToWord(), currentUserId)
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, responsedto.ErrorResponse(err))
@@ -62,7 +63,8 @@ func (h *WordsHandler) handleSaveWord(ctx *gin.Context) {
 // @Security     BearerAuth
 // @Router       /api/words [get]
 func (h *WordsHandler) handleGetWords(ctx *gin.Context) {
-	result, err := h.wordSvc.GetAll(ctx)
+	currentUserId := ctx.Value("user_id").(string)
+	result, err := h.wordSvc.GetAll(ctx, currentUserId)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, responsedto.ErrorResponse(err))
 		return
@@ -84,9 +86,12 @@ func (h *WordsHandler) handleGetWords(ctx *gin.Context) {
 func (h *WordsHandler) handleDeleteWord(ctx *gin.Context) {
 	wordId, ok := ctx.Params.Get("id")
 	if !ok {
-
+		ctx.JSON(http.StatusBadRequest, responsedto.ErrorResponse(apperror.ErrBadJsonStructure))
+		return
 	}
-	err := h.wordSvc.Delete(ctx, wordId)
+
+	currentUserId := ctx.Value("user_id").(string)
+	err := h.wordSvc.Delete(ctx, wordId, currentUserId)
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, responsedto.ErrorResponse(err))

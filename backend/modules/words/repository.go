@@ -3,7 +3,6 @@ package words
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -20,15 +19,12 @@ func NewWordRepository(pool *pgxpool.Pool) *WordRepository {
 
 // CREATE
 // Working on splitting create and update operation
-func (wr *WordRepository) Save(ctx context.Context, word Word) (Word, error) {
+func (wr *WordRepository) Save(ctx context.Context, word Word, currentUserId string) (Word, error) {
 	var query = `
 	INSERT INTO words ("user_id", "origin", "source_lang", "translated", "target_lang", "is_saved")
 	VALUES ($1, $2, $3, $4, $5, $6)
 	RETURNING ` + wordColumns + `
 	`
-
-	currentUserId := ctx.Value("user_id").(string)
-	fmt.Println("current user id:", currentUserId)
 
 	var savedWord Word
 	err := wr.pool.QueryRow(ctx, query, currentUserId, word.Origin, word.SourceLang, word.Translated, word.TargetLang, true).Scan(
@@ -51,14 +47,12 @@ func (wr *WordRepository) Save(ctx context.Context, word Word) (Word, error) {
 }
 
 // UPDATE
-func (wr *WordRepository) Update(ctx context.Context, word Word) (string, error) {
+func (wr *WordRepository) Update(ctx context.Context, word Word, currentUserId string) (string, error) {
 	return "", fmt.Errorf("not implemented")
 }
 
 // READ
-func (wr *WordRepository) GetAll(ctx context.Context) ([]Word, error) {
-	currentUserId := ctx.Value("user_id").(string)
-	log.Println(currentUserId)
+func (wr *WordRepository) GetAll(ctx context.Context, currentUserId string) ([]Word, error) {
 	var query = `SELECT ` + wordColumns + ` FROM words WHERE user_id = $1 AND (deleted_at IS NULL AND is_saved = true)`
 
 	result, err := wr.pool.Query(ctx, query, currentUserId)
@@ -92,9 +86,7 @@ func (wr *WordRepository) GetAll(ctx context.Context) ([]Word, error) {
 	return words, nil
 }
 
-func (wr *WordRepository) GetById(ctx context.Context, wordId string) (Word, error) {
-	currentUserId := ctx.Value("user_id").(string)
-
+func (wr *WordRepository) GetById(ctx context.Context, wordId string, currentUserId string) (Word, error) {
 	var query = `SELECT ` + wordColumns + ` FROM words WHERE user_id = $1 AND id = $2`
 
 	var word Word
@@ -122,9 +114,7 @@ func (wr *WordRepository) GetById(ctx context.Context, wordId string) (Word, err
 	return word, nil
 }
 
-func (wr *WordRepository) GetByUserId(ctx context.Context, userId string) ([]Word, error) {
-	currentUserId := ctx.Value("user_id").(string)
-
+func (wr *WordRepository) GetByUserId(ctx context.Context, currentUserId string) ([]Word, error) {
 	var query = `SELECT ` + wordColumns + ` FROM words WHERE user_id = $1`
 
 	result, err := wr.pool.Query(ctx, query, currentUserId)
@@ -160,10 +150,8 @@ func (wr *WordRepository) GetByUserId(ctx context.Context, userId string) ([]Wor
 }
 
 // DELETE
-func (wr *WordRepository) Delete(ctx context.Context, wordId string) error {
-	currentUserId := ctx.Value("user_id").(string)
-
-	_, err := wr.GetById(ctx, wordId)
+func (wr *WordRepository) Delete(ctx context.Context, wordId string, currentUserId string) error {
+	_, err := wr.GetById(ctx, wordId, currentUserId)
 	if err != nil {
 		return ErrWordNotFound
 	}
@@ -185,10 +173,8 @@ func (wr *WordRepository) Delete(ctx context.Context, wordId string) error {
 	return nil
 }
 
-func (wr *WordRepository) DeleteBulk(ctx context.Context, wordIds []string) error {
+func (wr *WordRepository) DeleteBulk(ctx context.Context, wordIds []string, currentUserId string) error {
 	query := `UPDATE words SET deleted_at = NOW() WHERE id = ANY($1) AND user_id = $2`
-
-	currentUserId := ctx.Value("user_id").(string)
 
 	tag, err := wr.pool.Exec(ctx, query, wordIds, currentUserId)
 

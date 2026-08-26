@@ -94,7 +94,7 @@ func (us *AuthService) RefreshToken(ctx context.Context, req RefreshTokenRequest
 }
 
 func (us *AuthService) Logout(ctx context.Context) (bool, *apperror.AppError) {
-	userID := ctx.Value("userID").(string)
+	userID := ctx.Value("user_id").(string)
 
 	if userID == "" {
 		return false, apperror.ErrInvalidUserData.WithMessage(
