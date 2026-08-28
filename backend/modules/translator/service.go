@@ -9,7 +9,6 @@ import (
 
 	"glossa/modules/agent"
 	"glossa/modules/definition"
-	"glossa/modules/translator/dtos"
 
 	translate "cloud.google.com/go/translate/apiv3"
 	"cloud.google.com/go/translate/apiv3/translatepb"
@@ -17,11 +16,12 @@ import (
 )
 
 type TranslationService struct {
-	Client    *translate.TranslationClient
-	DictApi   string
-	ProjectID string
-	DefSvc    *definition.WordDefinitionService
-	AgentSvc  agent.AgentService
+	Client               *translate.TranslationClient
+	DictApi              string
+	ProjectID            string
+	DefSvc               *definition.WordDefinitionService
+	AgentSvc             agent.AgentService
+	translationConverter TranslationConverter
 }
 
 func NewTranslationService(
@@ -30,14 +30,22 @@ func NewTranslationService(
 	projectID string,
 	defSvc *definition.WordDefinitionService,
 	agentSvc agent.AgentService,
+	translateConverter TranslationConverter,
 ) (*TranslationService, error) {
-	return &TranslationService{Client: client, DictApi: dictApi, ProjectID: projectID, DefSvc: defSvc, AgentSvc: agentSvc}, nil
+	return &TranslationService{
+		Client:               client,
+		DictApi:              dictApi,
+		ProjectID:            projectID,
+		DefSvc:               defSvc,
+		AgentSvc:             agentSvc,
+		translationConverter: translateConverter,
+	}, nil
 }
 
-func (svc *TranslationService) Translate(ctx context.Context, input string, target string) (dtos.WordResult, error) {
+func (svc *TranslationService) Translate(ctx context.Context, input string, target string) (WordResult, error) {
 	eg, egcx := errgroup.WithContext(ctx)
 
-	var result dtos.WordResult
+	var result WordResult
 
 	eg.Go(func() error {
 		res, err := svc.fetchGoogleTranslate(egcx, input, target)
@@ -69,17 +77,17 @@ func (svc *TranslationService) Translate(ctx context.Context, input string, targ
 	})
 
 	if err := eg.Wait(); err != nil {
-		return dtos.WordResult{}, err
+		return WordResult{}, err
 	}
 
 	return result, nil
 }
 
-func (svc *TranslationService) TranslateWithAgent(ctx context.Context, input string, target string) (dtos.WordResult, error) {
+func (svc *TranslationService) TranslateWithAgent(ctx context.Context, input string, target string) (WordResult, error) {
 	def, err := svc.DefSvc.GetWordDefinition(ctx, input)
 
 	if err != nil {
-		return dtos.WordResult{}, err
+		return WordResult{}, err
 	}
 
 	meaningString, _ := json.Marshal(def[0].Meanings)
@@ -93,21 +101,14 @@ func (svc *TranslationService) TranslateWithAgent(ctx context.Context, input str
 
 	result, err := svc.AgentSvc.CallOpenRouterAgent(ctx, props)
 	if err != nil {
-		return dtos.WordResult{}, err
+		return WordResult{}, err
 	}
 
-	meaningString, _ = json.Marshal(result)
-	fmt.Println("Meanings from agent: ", string(meaningString))
-
-	meanings, err := definition.ParseLLMResponseToMeaning(meaningString)
-	if err != nil {
-		log.Printf("Definition Service: %v", err)
-		return dtos.WordResult{}, err
-	}
+	meanings := svc.translationConverter.ToSystemMeaningList(result)
 
 	def[0].Meanings = meanings
 
-	return dtos.WordResult{
+	return WordResult{
 		Definitions: def,
 	}, nil
 }

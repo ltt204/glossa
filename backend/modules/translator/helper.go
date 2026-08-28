@@ -2,7 +2,6 @@ package translator
 
 import (
 	"errors"
-	"glossa/modules/translator/dtos"
 	"strings"
 
 	"cloud.google.com/go/translate/apiv3/translatepb"
@@ -33,8 +32,8 @@ func isRateLimitError(err error) bool {
 	return false
 }
 
-func toTranslationResponse(input *translatepb.Translation) dtos.Translation {
-	return dtos.Translation{
+func toTranslationResponse(input *translatepb.Translation) TranslationResponse {
+	return TranslationResponse{
 		TranslatedText:       input.GetTranslatedText(),
 		DetectedLanguageCode: input.GetDetectedLanguageCode(),
 	}

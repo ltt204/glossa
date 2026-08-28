@@ -5,7 +5,6 @@ import (
 	"glossa/internal/apperror"
 	"glossa/internal/responsedto"
 	"glossa/modules/definition"
-	"glossa/modules/translator/dtos"
 	"log"
 	"net/http"
 	"time"
@@ -27,8 +26,8 @@ func NewHandler(svc *TranslationService) *TranslationHandler {
 // @Tags         Translator
 // @Accept       json
 // @Produce      json
-// @Param        translateRequest body dtos.TranslateRequest true "Translation request body"
-// @Success      200  {object} responsedto.ApplicationResponse{content=dtos.Translation} "Translate success"
+// @Param        translateRequest body TranslateRequest true "Translation request body"
+// @Success      200  {object} responsedto.ApplicationResponse{content=Translation} "Translate success"
 // @Failure      400  {object} responsedto.ApplicationErrorResponse "Invalid JSON structure"
 // @Failure      500  {object} responsedto.ApplicationErrorResponse "Failed to translate word"
 // @Security     BearerAuth
@@ -43,7 +42,7 @@ func (h *TranslationHandler) handleTranslate(ctx *gin.Context) {
 		ctx.JSON(appErr.Status, appErr.ToGinMap())
 		return
 	default:
-		var req dtos.TranslateRequest
+		var req TranslateRequest
 		if err := ctx.ShouldBindJSON(&req); err != nil {
 			appErr := apperror.ErrBadJsonStructure.WithErr(err)
 			ctx.JSON(appErr.Status, appErr.ToGinMap())
@@ -70,8 +69,8 @@ func (h *TranslationHandler) handleTranslateMock(ctx *gin.Context) {
 		return
 	case <-time.After(2 * time.Second):
 
-		appRes := responsedto.SuccessResponse("Translate success", dtos.WordResult{
-			Translations: []dtos.Translation{
+		appRes := responsedto.SuccessResponse("Translate success", WordResult{
+			Translations: []TranslationResponse{
 				{
 					TranslatedText:       "Mock Translation Response",
 					DetectedLanguageCode: "en",
@@ -135,7 +134,7 @@ func (h *TranslationHandler) handleTranslateWithAgent(ctx *gin.Context) {
 		ctx.JSON(appErr.Status, appErr.ToGinMap())
 		return
 	default:
-		var req dtos.TranslateRequest
+		var req TranslateRequest
 		if err := ctx.ShouldBindJSON(&req); err != nil {
 			appErr := apperror.ErrBadJsonStructure.WithErr(err)
 			ctx.JSON(appErr.Status, appErr.ToGinMap())

@@ -74,7 +74,8 @@ func main() {
 	}
 	definitionService := definition.NewWordDefinitionService(appConfig.DictApi)
 	agentService := agent.NewAgentService(definitionService, agentConfig)
-	translationSvc, err := translator.NewTranslationService(translationClient, appConfig.DictApi, appConfig.ProjectID, definitionService, agentService)
+	translateConverter := translator.TranslationConverterImpl{}
+	translationSvc, err := translator.NewTranslationService(translationClient, appConfig.DictApi, appConfig.ProjectID, definitionService, agentService, &translateConverter)
 	translateHandler := translator.NewHandler(translationSvc)
 
 	router := gin.Default()
