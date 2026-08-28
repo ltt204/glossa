@@ -125,6 +125,36 @@ func (h *TranslationHandler) handleTranslateMock(ctx *gin.Context) {
 	}
 }
 
+func (h *TranslationHandler) handleTranslateWithAgent(ctx *gin.Context) {
+	reqCtx, cancel := context.WithTimeout(ctx.Request.Context(), 20*time.Second)
+	defer cancel()
+
+	select {
+	case <-reqCtx.Done():
+		appErr := apperror.TimeoutError.WithMessage("Request timed out.")
+		ctx.JSON(appErr.Status, appErr.ToGinMap())
+		return
+	default:
+		var req dtos.TranslateRequest
+		if err := ctx.ShouldBindJSON(&req); err != nil {
+			appErr := apperror.ErrBadJsonStructure.WithErr(err)
+			ctx.JSON(appErr.Status, appErr.ToGinMap())
+			return
+		}
+
+		result, err := h.translationSvc.TranslateWithAgent(reqCtx, req.Text, req.Target)
+		if err != nil {
+			appErr := apperror.FailedTranslateWord.WithErr(err)
+			appRes := responsedto.ErrorResponse(appErr)
+			ctx.JSON(appErr.Status, appRes)
+			return
+		}
+
+		appRes := responsedto.SuccessResponse("Translate success", result)
+		ctx.JSON(http.StatusOK, appRes)
+	}
+}
+
 func (h *TranslationHandler) RegisterRoutes(rg *gin.RouterGroup) {
-	rg.POST("/translate", h.handleTranslateMock)
+	rg.POST("/translate", h.handleTranslateWithAgent)
 }

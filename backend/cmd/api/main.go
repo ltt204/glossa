@@ -5,6 +5,7 @@ import (
 	"glossa/internal/config"
 	"glossa/internal/db"
 	"glossa/internal/middleware"
+	"glossa/modules/agent"
 	"glossa/modules/auth"
 	"glossa/modules/definition"
 	"glossa/modules/translator"
@@ -58,10 +59,7 @@ func main() {
 	// Executes (Closed the connection) when the surrounding function (main --> application is stoped) returns
 	defer connectionPool.Close()
 
-	wordRepo := words.NewWordRepository(connectionPool)
-	wConverter := words.WordConverterImpl{}
-	wordSvc := words.NewWordService(wordRepo, &wConverter)
-	wordHandler := words.NewHandler(wordSvc)
+	wordHandler := words.Init(connectionPool)
 
 	userRepo := users.NewUserRepository(connectionPool)
 	tokenRepo := auth.NewTokenRepository(connectionPool, []byte(appConfig.JwtSecret))
@@ -71,7 +69,8 @@ func main() {
 	authHandler := auth.NewHandler(*authService)
 
 	definitionService := definition.NewWordDefinitionService(appConfig.DictApi)
-	translationSvc, err := translator.NewTranslationService(translationClient, appConfig.DictApi, appConfig.ProjectID, definitionService)
+	agentService := agent.NewAgentService(definitionService)
+	translationSvc, err := translator.NewTranslationService(translationClient, appConfig.DictApi, appConfig.ProjectID, definitionService, agentService)
 	translateHandler := translator.NewHandler(translationSvc)
 
 	router := gin.Default()

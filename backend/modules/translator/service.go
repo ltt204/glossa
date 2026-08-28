@@ -6,6 +6,7 @@ import (
 	"log"
 	"time"
 
+	"glossa/modules/agent"
 	"glossa/modules/definition"
 	"glossa/modules/translator/dtos"
 
@@ -19,6 +20,7 @@ type TranslationService struct {
 	DictApi   string
 	ProjectID string
 	DefSvc    *definition.WordDefinitionService
+	AgentSvc  agent.AgentService
 }
 
 func NewTranslationService(
@@ -26,8 +28,9 @@ func NewTranslationService(
 	dictApi string,
 	projectID string,
 	defSvc *definition.WordDefinitionService,
+	agentSvc agent.AgentService,
 ) (*TranslationService, error) {
-	return &TranslationService{Client: client, DictApi: dictApi, ProjectID: projectID, DefSvc: defSvc}, nil
+	return &TranslationService{Client: client, DictApi: dictApi, ProjectID: projectID, DefSvc: defSvc, AgentSvc: agentSvc}, nil
 }
 
 func (svc *TranslationService) Translate(ctx context.Context, input string, target string) (dtos.WordResult, error) {
@@ -69,6 +72,35 @@ func (svc *TranslationService) Translate(ctx context.Context, input string, targ
 	}
 
 	return result, nil
+}
+
+func (svc *TranslationService) TranslateWithAgent(ctx context.Context, input string, target string) (dtos.WordResult, error) {
+	def, err := svc.DefSvc.GetWordDefinition(ctx, input)
+
+	if err != nil {
+		return dtos.WordResult{}, err
+	}
+
+	partOfSpeeches := []string{}
+	for _, meaning := range def[0].Meanings {
+		partOfSpeeches = append(partOfSpeeches, meaning.PartOfSpeech)
+	}
+
+	props := agent.TranslateProps{
+		TargetLang:   target,
+		SourceLang:   "en",
+		Origin:       input,
+		PartOfSpeech: partOfSpeeches,
+	}
+
+	result, err := svc.AgentSvc.CallOpenRouterAgent(ctx, props)
+	if err != nil {
+		return dtos.WordResult{}, err
+	}
+
+	fmt.Println("Result from agent is: ", result)
+
+	return dtos.WordResult{}, nil
 }
 
 func (svc *TranslationService) fetchGoogleTranslate(ctx context.Context, input string, target string) ([]*translatepb.Translation, error) {
