@@ -4,13 +4,14 @@ import (
 	"context"
 	"glossa/internal/apperror"
 	"glossa/modules/users"
+	"log"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthRepository interface {
-	Signup(ctx context.Context, req users.CreateUserRequest) (users.User, error)
-	Signin(ctx context.Context, req SigninRequest) (SigninResponse, error)
+	Signup(ctx context.Context, req users.User) (users.User, error)
+	Signin(ctx context.Context, email string, password string) (string, string, users.User, error)
 	RefreshToken(ctx context.Context, req RefreshTokenRequest) (string, string, error)
 	Logout(ctx context.Context, userID string) (bool, error)
 	GetByEmail(ctx context.Context, email string) (users.User, error)
@@ -25,9 +26,10 @@ func NewAuthRepository(userRepo UserRepository, refRepo TokenRepository) AuthRep
 	return &authRepository{userRepo: userRepo, refRepo: refRepo}
 }
 
-func (authRepo *authRepository) Signup(ctx context.Context, req users.CreateUserRequest) (users.User, error) {
+func (authRepo *authRepository) Signup(ctx context.Context, req users.User) (users.User, error) {
 	user, err := authRepo.userRepo.Save(ctx, req)
 	if err != nil {
+		log.Println("Error[auth_repository.signup]: ", err)
 		return users.User{}, apperror.InternalServerError.WithMessage("Something went wrong.")
 	}
 
@@ -38,30 +40,26 @@ func (authRepo *authRepository) GetByEmail(ctx context.Context, email string) (u
 	return authRepo.userRepo.GetByEmail(ctx, email)
 }
 
-func (authRepo *authRepository) Signin(ctx context.Context, req SigninRequest) (SigninResponse, error) {
-	user, err := authRepo.userRepo.GetByEmail(ctx, req.Email)
+func (authRepo *authRepository) Signin(ctx context.Context, email string, password string) (string, string, users.User, error) {
+	user, err := authRepo.userRepo.GetByEmail(ctx, email)
 	if err != nil {
-		return SigninResponse{}, apperror.ErrResourceNotFound.WithMessage("User not found.")
+		return "", "", users.User{}, apperror.ErrResourceNotFound.WithMessage("User not found.")
 	}
 
 	if user.DeletedAt != nil {
-		return SigninResponse{}, apperror.ErrResourceNotFound.WithMessage("User not found.")
+		return "", "", users.User{}, apperror.ErrResourceNotFound.WithMessage("User not found.")
 	}
 
-	if err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
-		return SigninResponse{}, apperror.ErrUnauthorized.WithMessage("Invalid credentials.")
+	if err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
+		return "", "", users.User{}, apperror.ErrUnauthorized.WithMessage("Invalid credentials.")
 	}
 
 	accessToken, refreshToken, err := authRepo.refRepo.GenerateTokens(ctx, user.ID)
 	if err != nil {
-		return SigninResponse{}, apperror.ErrFailedToCreate.WithMessage(err.Error())
+		return "", "", users.User{}, apperror.ErrFailedToCreate.WithMessage(err.Error())
 	}
 
-	return SigninResponse{
-		AccessToken:  accessToken,
-		RefreshToken: refreshToken,
-		User:         user.ToDto(),
-	}, nil
+	return accessToken, refreshToken, user, nil
 }
 
 func (authRepo *authRepository) RefreshToken(ctx context.Context, req RefreshTokenRequest) (string, string, error) {

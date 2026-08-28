@@ -82,9 +82,6 @@ func (refRepo *tokenRepository) GenerateTokens(ctx context.Context, userID strin
 		TokenHash: refreshToken,
 	})
 
-	log.Println("DEBUG[token_repository.generate_tokens] raw_ref_token: ", rawRefToken)
-	log.Println("DEBUG[token_repository.generate_tokens] refresh_token: ", refreshToken)
-
 	if err != nil {
 		log.Println("Error[token_repository.generate_tokens]: ", err)
 		return "", "", err
@@ -99,9 +96,6 @@ func (refRepo *tokenRepository) GenerateAcccessTokens(ctx context.Context, rawRe
 
 	hash := sha256.Sum256([]byte(rawRefToken))
 	hashedRefreshToken := hex.EncodeToString(hash[:])
-
-	log.Println("DEBUG[token_repository.generate_access_tokens] raw_ref_token: ", rawRefToken)
-	log.Println("DEBUG[token_repository.generate_access_tokens] hashed_refresh_token: ", hashedRefreshToken)
 
 	var refreshTokenDO RefreshToken
 	row := refRepo.pool.QueryRow(ctx, "SELECT * FROM refresh_token WHERE token_hash = $1", hashedRefreshToken)

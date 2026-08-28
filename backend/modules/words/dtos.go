@@ -2,14 +2,14 @@ package words
 
 type WordSavingRequest struct {
 	Origin     string `json:"origin" binding:"required" example:"hello"`
-	Source     string `json:"source" binding:"required" example:"en"`
+	SourceLang string `json:"sourceLang" binding:"required" example:"en"`
 	Translated string `json:"translated" binding:"required" example:"xin chào"`
-	Target     string `json:"target" binding:"required" example:"vi"`
+	TargetLang string `json:"targetLang" binding:"required" example:"vi"`
 }
 
 type WordResponse struct {
 	ID         string `json:"id"`
-	UserId     string `json:"userId"`
+	UserID     string `json:"userId"`
 	Origin     string `json:"origin"`
 	SourceLang string `json:"sourceLang"`
 	Translated string `json:"translated"`

@@ -59,13 +59,15 @@ func main() {
 	defer connectionPool.Close()
 
 	wordRepo := words.NewWordRepository(connectionPool)
-	wordSvc := words.NewWordService(wordRepo)
+	wConverter := words.WordConverterImpl{}
+	wordSvc := words.NewWordService(wordRepo, &wConverter)
 	wordHandler := words.NewHandler(wordSvc)
 
 	userRepo := users.NewUserRepository(connectionPool)
 	tokenRepo := auth.NewTokenRepository(connectionPool, []byte(appConfig.JwtSecret))
 	authRepo := auth.NewAuthRepository(userRepo, tokenRepo)
-	authService := auth.NewAuthService(authRepo, tokenRepo)
+	uConverter := users.UserConverterImpl{}
+	authService := auth.NewAuthService(authRepo, tokenRepo, &uConverter)
 	authHandler := auth.NewHandler(*authService)
 
 	definitionService := definition.NewWordDefinitionService(appConfig.DictApi)

@@ -3,8 +3,8 @@ package words
 import "time"
 
 type Word struct {
-	Id     string
-	UserId string
+	ID     string
+	UserID string
 
 	Origin     string
 	SourceLang string
@@ -14,8 +14,8 @@ type Word struct {
 
 	IsSaved bool
 
-	createdAt time.Time
-	updatedAt time.Time
+	CreatedAt time.Time
+	UpdatedAt time.Time
 
-	deletedAt *time.Time
+	DeletedAt *time.Time
 }

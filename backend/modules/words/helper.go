@@ -2,8 +2,8 @@ package words
 
 func (w *Word) ToResponse() WordResponse {
 	return WordResponse{
-		ID:         w.Id,
-		UserId:     w.UserId,
+		ID:         w.ID,
+		UserID:     w.UserID,
 		Origin:     w.Origin,
 		SourceLang: w.SourceLang,
 		Translated: w.Translated,
@@ -15,8 +15,8 @@ func (w *Word) ToResponse() WordResponse {
 func (runeq *WordSavingRequest) ToWord() Word {
 	return Word{
 		Origin:     runeq.Origin,
-		SourceLang: runeq.Source,
+		SourceLang: runeq.SourceLang,
 		Translated: runeq.Translated,
-		TargetLang: runeq.Target,
+		TargetLang: runeq.TargetLang,
 	}
 }

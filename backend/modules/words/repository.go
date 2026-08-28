@@ -28,15 +28,15 @@ func (wr *WordRepository) Save(ctx context.Context, word Word, currentUserId str
 
 	var savedWord Word
 	err := wr.pool.QueryRow(ctx, query, currentUserId, word.Origin, word.SourceLang, word.Translated, word.TargetLang, true).Scan(
-		&savedWord.Id,
-		&savedWord.UserId,
+		&savedWord.ID,
+		&savedWord.UserID,
 		&savedWord.Origin,
 		&savedWord.SourceLang,
 		&savedWord.Translated,
 		&savedWord.TargetLang,
-		&savedWord.createdAt,
-		&savedWord.updatedAt,
-		&savedWord.deletedAt,
+		&savedWord.CreatedAt,
+		&savedWord.UpdatedAt,
+		&savedWord.DeletedAt,
 		&savedWord.IsSaved,
 	)
 
@@ -65,15 +65,15 @@ func (wr *WordRepository) GetAll(ctx context.Context, currentUserId string) ([]W
 	for result.Next() {
 		var word Word
 		err = result.Scan(
-			&word.Id,
-			&word.UserId,
+			&word.ID,
+			&word.UserID,
 			&word.Origin,
 			&word.SourceLang,
 			&word.Translated,
 			&word.TargetLang,
-			&word.createdAt,
-			&word.updatedAt,
-			&word.deletedAt,
+			&word.CreatedAt,
+			&word.UpdatedAt,
+			&word.DeletedAt,
 			&word.IsSaved,
 		)
 		if err != nil {
@@ -91,15 +91,15 @@ func (wr *WordRepository) GetById(ctx context.Context, wordId string, currentUse
 
 	var word Word
 	err := wr.pool.QueryRow(ctx, query, currentUserId, wordId).Scan(
-		&word.Id,
-		&word.UserId,
+		&word.ID,
+		&word.UserID,
 		&word.Origin,
 		&word.SourceLang,
 		&word.Translated,
 		&word.TargetLang,
-		&word.createdAt,
-		&word.updatedAt,
-		&word.deletedAt,
+		&word.CreatedAt,
+		&word.UpdatedAt,
+		&word.DeletedAt,
 		&word.IsSaved,
 	)
 
@@ -107,7 +107,7 @@ func (wr *WordRepository) GetById(ctx context.Context, wordId string, currentUse
 		return Word{}, fmt.Errorf("words: error for get word %s: %w", wordId, err)
 	}
 
-	if word.UserId != currentUserId {
+	if word.UserID != currentUserId {
 		return Word{}, ErrWordNotFound
 	}
 
@@ -127,15 +127,15 @@ func (wr *WordRepository) GetByUserId(ctx context.Context, currentUserId string)
 	for result.Next() {
 		var word Word
 		err = result.Scan(
-			&word.Id,
-			&word.UserId,
+			&word.ID,
+			&word.UserID,
 			&word.Origin,
 			&word.SourceLang,
 			&word.Translated,
 			&word.TargetLang,
-			&word.createdAt,
-			&word.updatedAt,
-			&word.deletedAt,
+			&word.CreatedAt,
+			&word.UpdatedAt,
+			&word.DeletedAt,
 			&word.IsSaved,
 		)
 		if err != nil {

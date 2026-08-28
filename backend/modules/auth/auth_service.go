@@ -5,15 +5,18 @@ import (
 	"glossa/internal/apperror"
 	"glossa/modules/users"
 	"net/http"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthService struct {
-	authRepo AuthRepository
-	refRepo  TokenRepository
+	authRepo  AuthRepository
+	refRepo   TokenRepository
+	converter users.UserConverter
 }
 
-func NewAuthService(authRepo AuthRepository, refRepo TokenRepository) *AuthService {
-	return &AuthService{authRepo: authRepo, refRepo: refRepo}
+func NewAuthService(authRepo AuthRepository, refRepo TokenRepository, converter users.UserConverter) *AuthService {
+	return &AuthService{authRepo: authRepo, refRepo: refRepo, converter: converter}
 }
 
 func (us *AuthService) Signup(ctx context.Context, req SignupRequest) (SignupResponse, *apperror.AppError) {
@@ -31,7 +34,13 @@ func (us *AuthService) Signup(ctx context.Context, req SignupRequest) (SignupRes
 		)
 	}
 
-	user, err := us.authRepo.Signup(ctx, users.CreateUserRequest(req))
+	createUserReq := users.CreateUserRequest(req)
+	createUserReq.Password, err = us.hashPassword(createUserReq.Password)
+	if err != nil {
+		return SignupResponse{}, apperror.InternalServerError.WithMessage(err.Error())
+	}
+
+	user, err := us.authRepo.Signup(ctx, us.converter.ToEntity(createUserReq))
 	if err != nil {
 		return SignupResponse{}, apperror.InternalServerError.WithMessage(
 			"Failed to create user!",
@@ -48,7 +57,7 @@ func (us *AuthService) Signup(ctx context.Context, req SignupRequest) (SignupRes
 	return SignupResponse{
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
-		User:         user.ToDto(),
+		User:         us.converter.ToDTO(user),
 	}, nil
 }
 
@@ -62,13 +71,17 @@ func (us *AuthService) Signin(ctx context.Context, req SigninRequest) (SigninRes
 		)
 	}
 
-	signinResponse, err := us.authRepo.Signin(ctx, req)
+	accessToken, refreshToken, user, err := us.authRepo.Signin(ctx, req.Email, req.Password)
 
 	if err != nil {
-		return SigninResponse{}, apperror.ErrFailedToCreate
+		return SigninResponse{}, apperror.NewAppError(err)
 	}
 
-	return signinResponse, nil
+	return SigninResponse{
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+		User:         us.converter.ToDTO(user),
+	}, nil
 }
 
 func (us *AuthService) RefreshToken(ctx context.Context, req RefreshTokenRequest) (RefreshTokenResponse, *apperror.AppError) {
@@ -109,4 +122,12 @@ func (us *AuthService) Logout(ctx context.Context) (bool, *apperror.AppError) {
 	}
 
 	return ok, nil
+}
+
+func (us *AuthService) hashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 10)
+	if err != nil {
+		return "", apperror.InternalServerError.WithMessage("Something went wrong.")
+	}
+	return string(bytes), nil
 }

@@ -10,7 +10,7 @@ func NewUserService(userRepo *UserRepository) *UserService {
 	return &UserService{userRepo: userRepo}
 }
 
-func (us *UserService) Save(ctx context.Context, req CreateUserRequest) (User, error) {
+func (us *UserService) Save(ctx context.Context, req User) (User, error) {
 	return us.userRepo.Save(ctx, req)
 }
 

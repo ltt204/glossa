@@ -7,11 +7,12 @@ import (
 )
 
 type WordService struct {
-	Wr *WordRepository
+	Wr        *WordRepository
+	converter WordConverter
 }
 
-func NewWordService(wr *WordRepository) *WordService {
-	return &WordService{Wr: wr}
+func NewWordService(wr *WordRepository, converter WordConverter) *WordService {
+	return &WordService{Wr: wr, converter: converter}
 }
 
 func (ws *WordService) Save(ctx context.Context, word Word, currentUserId string) (WordResponse, *apperror.AppError) {
