@@ -68,8 +68,12 @@ func main() {
 	authService := auth.NewAuthService(authRepo, tokenRepo, &uConverter)
 	authHandler := auth.NewHandler(*authService)
 
+	agentConfig, err := agent.Load()
+	if err != nil {
+		log.Fatal("Failed to load agent config: ", err)
+	}
 	definitionService := definition.NewWordDefinitionService(appConfig.DictApi)
-	agentService := agent.NewAgentService(definitionService)
+	agentService := agent.NewAgentService(definitionService, agentConfig)
 	translationSvc, err := translator.NewTranslationService(translationClient, appConfig.DictApi, appConfig.ProjectID, definitionService, agentService)
 	translateHandler := translator.NewHandler(translationSvc)
 
