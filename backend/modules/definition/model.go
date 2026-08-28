@@ -14,12 +14,13 @@ type Phonetic struct {
 
 type Meaning struct {
 	PartOfSpeech string       `json:"partOfSpeech"`
+	Translated   string       `json:"translated"`
 	Definitions  []Definition `json:"definitions"`
 }
 
 type Definition struct {
 	Definition string   `json:"definition"`
-	Example    string   `json:"example,omitempty"`
-	Synonyms   []string `json:"synonyms,omitempty"`
-	Antonyms   []string `json:"antonyms,omitempty"`
+	Example    string   `json:"example"`
+	Synonyms   []string `json:"synonyms"`
+	Antonyms   []string `json:"antonyms"`
 }

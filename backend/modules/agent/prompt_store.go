@@ -25,8 +25,7 @@ func ConstructTranslationPrompt(
 	prompt = strings.ReplaceAll(prompt, "$TARGET_LANG", props.TargetLang)
 	prompt = strings.ReplaceAll(prompt, "$SOURCE_LANG", props.SourceLang)
 	prompt = strings.ReplaceAll(prompt, "$ORIGIN", props.Origin)
-	partOfSpeechStr := strings.Join(props.PartOfSpeech, ", ")
-	prompt = strings.ReplaceAll(prompt, "$POS", partOfSpeechStr)
+	prompt = strings.ReplaceAll(prompt, "$MEANINGS", props.Meanings)
 
 	return prompt
 }

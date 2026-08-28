@@ -144,6 +144,7 @@ func (h *TranslationHandler) handleTranslateWithAgent(ctx *gin.Context) {
 
 		result, err := h.translationSvc.TranslateWithAgent(reqCtx, req.Text, req.Target)
 		if err != nil {
+			log.Println("Error translating word: ", err)
 			appErr := apperror.FailedTranslateWord.WithErr(err)
 			appRes := responsedto.ErrorResponse(appErr)
 			ctx.JSON(appErr.Status, appRes)

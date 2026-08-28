@@ -2,6 +2,7 @@ package translator
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"time"
@@ -81,16 +82,13 @@ func (svc *TranslationService) TranslateWithAgent(ctx context.Context, input str
 		return dtos.WordResult{}, err
 	}
 
-	partOfSpeeches := []string{}
-	for _, meaning := range def[0].Meanings {
-		partOfSpeeches = append(partOfSpeeches, meaning.PartOfSpeech)
-	}
+	meaningString, _ := json.Marshal(def[0].Meanings)
 
 	props := agent.TranslateProps{
-		TargetLang:   target,
-		SourceLang:   "en",
-		Origin:       input,
-		PartOfSpeech: partOfSpeeches,
+		TargetLang: target,
+		SourceLang: "en",
+		Origin:     input,
+		Meanings:   string(meaningString),
 	}
 
 	result, err := svc.AgentSvc.CallOpenRouterAgent(ctx, props)
@@ -98,9 +96,20 @@ func (svc *TranslationService) TranslateWithAgent(ctx context.Context, input str
 		return dtos.WordResult{}, err
 	}
 
-	fmt.Println("Result from agent is: ", result)
+	meaningString, _ = json.Marshal(result)
+	fmt.Println("Meanings from agent: ", string(meaningString))
 
-	return dtos.WordResult{}, nil
+	meanings, err := definition.ParseLLMResponseToMeaning(meaningString)
+	if err != nil {
+		log.Printf("Definition Service: %v", err)
+		return dtos.WordResult{}, err
+	}
+
+	def[0].Meanings = meanings
+
+	return dtos.WordResult{
+		Definitions: def,
+	}, nil
 }
 
 func (svc *TranslationService) fetchGoogleTranslate(ctx context.Context, input string, target string) ([]*translatepb.Translation, error) {
