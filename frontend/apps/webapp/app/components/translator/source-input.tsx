@@ -1,4 +1,10 @@
-import { ClearButton, SpeakButton, StateComponent, Textarea, TypingIndicator } from '@glossa/ui'
+import {
+	ClearButton,
+	SpeakButton,
+	StateComponent,
+	Textarea,
+	TypingIndicator,
+} from '@glossa/ui'
 import { DefinitionSidebarContent } from './definition-sidebar-content'
 import { DefinitionSidebarTitle } from './definition-sidebar-title'
 import {
@@ -49,7 +55,7 @@ export function SourceInput() {
 	}
 
 	return (
-		<div className="flex-1 flex flex-col px-3 py-2 min-h-0 border-2 border-solid rounded-md mx-4">
+		<div className="flex-1 flex flex-col px-4 py-2 min-h-0 border-2 border-solid rounded-md mx-4 h-3/5">
 			<div className="relative flex-1">
 				<Textarea
 					value={sourceText}

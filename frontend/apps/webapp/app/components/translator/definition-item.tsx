@@ -1,3 +1,5 @@
+'use client'
+
 import type { Definition } from '@glossa/core'
 import {
 	Badge,
@@ -5,7 +7,10 @@ import {
 	FieldContent,
 	FieldDescription,
 	FieldTitle,
+	Label,
 } from '@glossa/ui'
+import { useState } from 'react'
+import { WordBadges } from './word-badges'
 
 export function DefinitionItem({
 	partOfSpeech,
@@ -14,6 +19,8 @@ export function DefinitionItem({
 	partOfSpeech: string
 	definition: Definition
 }) {
+	const [showAllSym, setShowAllSym] = useState(false)
+	const [showAllAnt, setShowAllAnt] = useState(false)
 	return (
 		<div className="mb-2 rounded-md px-4 py-2 border-2 border-primary/20">
 			<Field orientation="horizontal">
@@ -25,11 +32,8 @@ export function DefinitionItem({
 							{definition.example}
 						</FieldDescription>
 					)}
-					<div className="flex flex-wrap gap-2 mt-2">
-						{definition.synonyms.map((synonym, idx) => (
-							<Badge key={idx}>{synonym}</Badge>
-						))}
-					</div>
+					<WordBadges payload={definition.synonyms} label="Synonyms" />
+					<WordBadges payload={definition.antonyms} label="Antonyms" />
 				</FieldContent>
 			</Field>
 		</div>

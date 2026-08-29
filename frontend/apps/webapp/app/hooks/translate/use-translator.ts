@@ -87,9 +87,13 @@ export function useTranslator() {
 			})
 
 			const res = await response.json()
+			console.log('Raw response: ', JSON.stringify(res, null, 2))
+
 			const parseResponse = TranslateResultSchema.safeParse(res.content)
+			console.log('Parsed response: ', JSON.stringify(parseResponse, null, 2))
 
 			const data = parseResponse.data
+			console.log('Parsed response data: ', JSON.stringify(data, null, 2))
 			if (!data || data.translations.length === 0) {
 				throw new Error('Translation not found')
 			}
@@ -100,6 +104,7 @@ export function useTranslator() {
 	})
 
 	if (!data) {
+		console.log('Data is empty: ', JSON.stringify(data, null, 2))
 		return {
 			isError,
 			isLoading,
