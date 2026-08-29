@@ -18,6 +18,7 @@ import (
 
 	_ "glossa/cmd/api/docs"
 
+	"charm.land/fantasy"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 
@@ -72,8 +73,10 @@ func main() {
 	if err != nil {
 		log.Fatal("Failed to load agent config: ", err)
 	}
+	var fantasyAgent fantasy.Agent = agent.GetAgentByConfig(agentConfig)
 	definitionService := definition.NewWordDefinitionService(appConfig.DictApi)
-	agentService := agent.NewAgentService(definitionService, agentConfig)
+	agentService := agent.NewAgentService(definitionService, fantasyAgent)
+
 	translateConverter := translator.TranslationConverterImpl{}
 	translationSvc, err := translator.NewTranslationService(translationClient, appConfig.DictApi, appConfig.ProjectID, definitionService, agentService, &translateConverter)
 	translateHandler := translator.NewHandler(translationSvc)

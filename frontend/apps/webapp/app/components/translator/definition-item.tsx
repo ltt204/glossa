@@ -10,6 +10,7 @@ import {
 	Label,
 } from '@glossa/ui'
 import { useState } from 'react'
+import { WordBadges } from './word-badges'
 
 export function DefinitionItem({
 	partOfSpeech,
@@ -31,48 +32,8 @@ export function DefinitionItem({
 							{definition.example}
 						</FieldDescription>
 					)}
-					<div className="flex flex-wrap gap-2 mt-2">
-						<Label className="text-sm mr-2">Synonyms:</Label>
-						{showAllSym || definition.synonyms.length <= 8 ? (
-							definition.synonyms.map((synonym, idx) => (
-								<Badge key={idx}>{synonym}</Badge>
-							))
-						) : (
-							<>
-								{definition.synonyms.slice(0, 8).map((synonym, idx) => (
-									<Badge key={idx}>{synonym}</Badge>
-								))}
-								<p
-									onClick={() => setShowAllSym(true)}
-									className="text-primary text-sm px-2 rounded-md hover:cursor-pointer hover:underline"
-								>
-									{' '}
-									+ {definition.synonyms.length - 8} more
-								</p>
-							</>
-						)}
-					</div>
-					<div className="flex flex-wrap gap-2 mt-2">
-						<Label className="text-sm mr-2">Antonyms:</Label>
-						{showAllAnt || definition.antonyms.length <= 8 ? (
-							definition.antonyms.map((antonym, idx) => (
-								<Badge key={idx}>{antonym}</Badge>
-							))
-						) : (
-							<>
-								{definition.antonyms.slice(0, 8).map((antonym, idx) => (
-									<Badge key={idx}>{antonym}</Badge>
-								))}
-								<p
-									onClick={() => setShowAllAnt(true)}
-									className="text-primary text-sm px-2 rounded-md hover:cursor-pointer hover:underline"
-								>
-									{' '}
-									+ {definition.antonyms.length - 8} more
-								</p>
-							</>
-						)}
-					</div>
+					<WordBadges payload={definition.synonyms} label="Synonyms" />
+					<WordBadges payload={definition.antonyms} label="Antonyms" />
 				</FieldContent>
 			</Field>
 		</div>

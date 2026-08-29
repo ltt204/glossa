@@ -13,26 +13,25 @@ type AgentService interface {
 
 type agentService struct {
 	definitionService *definition.WordDefinitionService
-	agentConfig       *AgentConfig
+	agent             fantasy.Agent
 }
 
-func NewAgentService(definitionService *definition.WordDefinitionService, agentConfig *AgentConfig) AgentService {
-	return &agentService{definitionService: definitionService, agentConfig: agentConfig}
+func NewAgentService(definitionService *definition.WordDefinitionService, agent fantasy.Agent) AgentService {
+	return &agentService{definitionService: definitionService, agent: agent}
 }
 
 func (s *agentService) CallOpenRouterAgent(ctx context.Context, props TranslateProps) ([]LLMResponse, error) {
-	agent := GetAgentByConfig(s.agentConfig)
 
 	prompt := ConstructTranslationPrompt(props)
-	result, err := agent.Generate(ctx, fantasy.AgentCall{Prompt: prompt})
+	result, err := s.agent.Generate(ctx, fantasy.AgentCall{Prompt: prompt})
 	if err != nil {
-		return []LLMResponse{}, nil
+		return nil, err
 	}
 
 	llmResponse, err := new(LLMResponse).Parse(result.Response.Content.Text())
 
 	if err != nil {
-		return []LLMResponse{}, nil
+		return nil, err
 	}
 
 	return llmResponse, nil

@@ -12,7 +12,7 @@ import (
 
 type AgentConfig struct {
 	OpenRouterApiKey string
-	OpenrouterModel       string
+	OpenrouterModel  string
 }
 
 func Load() (*AgentConfig, error) {
@@ -28,32 +28,25 @@ func Load() (*AgentConfig, error) {
 
 	return &AgentConfig{
 		OpenRouterApiKey: openrouterApiKey,
-		OpenrouterModel:       orModel,
+		OpenrouterModel:  orModel,
 	}, nil
 }
 
 func GetAgentByConfig(agentConfig *AgentConfig) fantasy.Agent {
-	// Provider initialization
 	provider, err := openrouter.New(openrouter.WithAPIKey(agentConfig.OpenRouterApiKey))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	bgContext := context.Background()
-	defer bgContext.Done()
-
-	model, err := provider.LanguageModel(bgContext, agentConfig.OpenrouterModel)
+	model, err := provider.LanguageModel(context.Background(), agentConfig.OpenrouterModel)
 	if err != nil {
 		log.Fatal(err)
 	}
-	// End of initialization
 
-	// Agent initialization
 	agent := fantasy.NewAgent(
 		model,
 		fantasy.WithMaxRetries(3),
 	)
-	// End of agent initialization
 
 	return agent
 }

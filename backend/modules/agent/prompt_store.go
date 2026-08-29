@@ -1,17 +1,19 @@
 package agent
 
 import (
-	"os"
+	_ "embed"
 	"strings"
 )
 
+//go:embed prompt_templates.md
+var promptTemplate string
+
 func Init() string {
-	bytes, err := os.ReadFile("/home/ltt204/go-project/glossa/backend/modules/agent/prompt_templates.md")
-	if err != nil {
-		panic(err)
+	if promptTemplate != "" {
+		return promptTemplate
 	}
 
-	return string(bytes)
+	return ""
 }
 
 func ConstructTranslationPrompt(
