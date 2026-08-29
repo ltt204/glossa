@@ -108,9 +108,6 @@ func (svc *TranslationService) TranslateWithAgent(ctx context.Context, input str
 
 	def[0].Meanings = meanings
 
-	jsonStr, _ := json.MarshalIndent(def, "", "  ")
-	fmt.Println("Definition: \n", string(jsonStr))
-
 	return WordResult{
 		Translations: []TranslationResponse{
 			{

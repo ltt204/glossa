@@ -2,7 +2,6 @@ package definition
 
 import (
 	"encoding/json"
-	"fmt"
 )
 
 func ParseDictionaryEntry(data []byte) ([]WordDefinitions, error) {
@@ -16,7 +15,6 @@ func ParseDictionaryEntry(data []byte) ([]WordDefinitions, error) {
 func ParseLLMResponseToMeaning(data []byte) ([]Meaning, error) {
 	var entry []Meaning
 	if err := json.Unmarshal(data, &entry); err != nil {
-		fmt.Println("Error unmarshalling LLM response: ", err)
 		return nil, err
 	}
 	return entry, nil
