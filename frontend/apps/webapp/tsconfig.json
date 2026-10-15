@@ -19,7 +19,9 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@glossa/ui/*": ["../../packages/ui/src/*"],
+      "@glossa/core/*": ["../../packages/core/src/*"]
     }
   },
   "include": [

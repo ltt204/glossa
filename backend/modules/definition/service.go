@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 )
 
@@ -35,7 +34,7 @@ func (svc *WordDefinitionService) GetWordDefinition(ctx context.Context, word st
 
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
-		log.Fatalf("Failed to read body: %v", err)
+		return result, err
 	}
 
 	parsedResult, err := ParseDictionaryEntry(body)

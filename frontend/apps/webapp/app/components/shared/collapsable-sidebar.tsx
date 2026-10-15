@@ -1,5 +1,5 @@
 import { useCollapsableSidebarStore } from '@/app/hooks'
-import { Button } from '@glossa/ui'
+import { Button, ScrollArea } from '@glossa/ui'
 import { X } from 'lucide-react'
 
 interface CollapsibleSidebarProps {
@@ -33,9 +33,9 @@ export function CollapsableSidebar({
 		>
 			<aside className="flex flex-col h-full">
 				{/* Inner Container */}
-				<div className="flex flex-col items-center px-4 pt-4 pb-2 h-full gap-2">
+				<div className="flex flex-col items-center h-full gap-2">
 					{/* Abstract Header */}
-					<div className="flex flex-row items-baselinpe justify-between w-full">
+					<div className="flex flex-row items-baseline justify-between w-full py-2 px-4">
 						{titlePayload.titleComponent && (
 							<titlePayload.titleComponent
 								title={titlePayload.title}
@@ -51,9 +51,13 @@ export function CollapsableSidebar({
 					</div>
 
 					{/* Abstract Content */}
-					{contentPayload.contentComponent && (
-						<contentPayload.contentComponent payload={contentPayload.payload} />
-					)}
+					<ScrollArea className="h-[calc(100vh-10rem)] w-full px-4">
+						{contentPayload.contentComponent && (
+							<contentPayload.contentComponent
+								payload={contentPayload.payload}
+							/>
+						)}
+					</ScrollArea>
 				</div>
 			</aside>
 		</div>

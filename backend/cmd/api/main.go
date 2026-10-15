@@ -5,6 +5,7 @@ import (
 	"glossa/internal/config"
 	"glossa/internal/db"
 	"glossa/internal/middleware"
+	"glossa/modules/agent"
 	"glossa/modules/auth"
 	"glossa/modules/definition"
 	"glossa/modules/translator"
@@ -17,6 +18,7 @@ import (
 
 	_ "glossa/cmd/api/docs"
 
+	"charm.land/fantasy"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 
@@ -58,10 +60,7 @@ func main() {
 	// Executes (Closed the connection) when the surrounding function (main --> application is stoped) returns
 	defer connectionPool.Close()
 
-	wordRepo := words.NewWordRepository(connectionPool)
-	wConverter := words.WordConverterImpl{}
-	wordSvc := words.NewWordService(wordRepo, &wConverter)
-	wordHandler := words.NewHandler(wordSvc)
+	wordHandler := words.Init(connectionPool)
 
 	userRepo := users.NewUserRepository(connectionPool)
 	tokenRepo := auth.NewTokenRepository(connectionPool, []byte(appConfig.JwtSecret))
@@ -70,8 +69,16 @@ func main() {
 	authService := auth.NewAuthService(authRepo, tokenRepo, &uConverter)
 	authHandler := auth.NewHandler(*authService)
 
+	agentConfig, err := agent.Load()
+	if err != nil {
+		log.Fatal("Failed to load agent config: ", err)
+	}
+	var fantasyAgent fantasy.Agent = agent.GetAgentByConfig(agentConfig)
 	definitionService := definition.NewWordDefinitionService(appConfig.DictApi)
-	translationSvc, err := translator.NewTranslationService(translationClient, appConfig.DictApi, appConfig.ProjectID, definitionService)
+	agentService := agent.NewAgentService(definitionService, fantasyAgent)
+
+	translateConverter := translator.TranslationConverterImpl{}
+	translationSvc, err := translator.NewTranslationService(translationClient, appConfig.DictApi, appConfig.ProjectID, definitionService, agentService, &translateConverter)
 	translateHandler := translator.NewHandler(translationSvc)
 
 	router := gin.Default()

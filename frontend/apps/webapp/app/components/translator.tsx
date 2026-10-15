@@ -41,7 +41,7 @@ export function Translator() {
 				detectedLang={detectedLang}
 			/>
 
-			<div className="flex-1 flex flex-col md:flex-row gap-4">
+			<div className="flex-1 flex flex-col md:flex-row gap-4 h-full">
 				{/* Source input */}
 				<SourceInput />
 				{/* Translation output */}

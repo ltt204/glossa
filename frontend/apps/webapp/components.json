@@ -13,11 +13,11 @@
   "iconLibrary": "lucide",
   "rtl": false,
   "aliases": {
-    "components": "@/components",
-    "utils": "@/lib/utils",
-    "ui": "@/components/ui",
-    "lib": "@/lib",
-    "hooks": "@/hooks"
+    "components": "@glossa/ui/src/components",
+    "utils": "@glossa/ui/src/lib/utils",
+    "ui": "@glossa/ui/src/components/ui",
+    "lib": "@glossa/ui/src/lib",
+    "hooks": "@glossa/core/src/hooks"
   },
   "menuColor": "default",
   "menuAccent": "subtle",
